@@ -1,0 +1,17 @@
+#!/bin/bash
+
+site='yahoo.com'
+if [ $# -gt 0 ]; then
+    site=$1
+fi
+
+date
+
+echo ''
+hostname
+
+echo ''
+ping -c 8 $site
+
+echo ''
+date
