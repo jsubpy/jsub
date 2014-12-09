@@ -1,5 +1,4 @@
 from .Entity import Entity
-from .Parameter import Parameter
 
 class Application(Entity):
     def __init__(self):
