@@ -70,10 +70,12 @@ class Job(Singleton):
 
         adapter.commonAdapt(self.__app_params, self.__repository)
 
+        repo_id = self.__repository.getRepoId()
         backend_params = []
         for job_id, sub_job_param in enumerate(self.__job_params):
             backend_param = adapter.subAdapt(job_id, self.__app_params, sub_job_param, self.__repository)
             backend_params.append(backend_param)
+            print 'Job %d.%d created' % (repo_id, job_id)
 
         return backend_params
 

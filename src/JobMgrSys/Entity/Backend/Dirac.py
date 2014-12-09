@@ -1,4 +1,3 @@
-
 from ...Core.Backend import Backend
 
 from DIRAC.Core.Base import Script
@@ -24,6 +23,8 @@ class Dirac(Backend):
         j.setName(job_name)
         j.setInputSandbox(input)
         j.setOutputSandbox(output)
+        if 'input_data' in param:
+            j.setInputData(param['input_data'])
 
         dirac = GridDirac()
         result = dirac.submit(j)
