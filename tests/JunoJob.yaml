@@ -1,0 +1,28 @@
+Experiment:
+  Name: juno
+  JobSteps:
+    - Type: Sim
+      Args: --gdml
+      
+    - Type: Calib
+    
+    - Type: Rec
+    
+Splitter:
+  Type: ByEvent
+  EventMaxPerJob: 20
+  EventTotal: 20*3
+  SeedStart: 10000
+
+Backend:
+  Name: Dirac
+  Site:
+    - CLUSTER.WHU.cn
+    - CLOUD.IHEP-OPENSTACK.cn
+    - CLOUD.IHEP-OPENNEBULA.cn
+    - CLOUD.INFN-PADOVANA.it
+  JobGroup: suob-juno-20160112
+  OutputSe: IHEP-STORM
+  OutputDir: /test/juno/0112
+  OutputPath: /juno-test/suob/0112
+  

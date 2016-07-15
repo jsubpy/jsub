@@ -1,0 +1,24 @@
+Experiment:
+  Name: bes
+  JobSteps:
+    - Type: Rec
+      Executable: boss.exe
+      Version: 6.6.4
+      JobOption: jobOptions_rec.txt
+      ReturnData: true
+    - Type: Sim
+      Executable: boss.exe
+      Version: 6.6.4
+      JobOption: jobOptions_sim.txt
+      ReturnData: fal
+    - Type: Ana
+      Executable: boss.exe
+      Version: 6.6.4
+      JobOption: jobOptions_ana.txt
+      ReturnData: fals
+      
+Splitter:
+  Type: ByEvent
+  EventMaxPerJob: 20
+  EventTotal: 20*3+1
+  SeedStart: auto

@@ -1,0 +1,27 @@
+Experiment:
+  Name: cepc
+  JobSteps:
+    - Type: Sim 
+      Executable: Mokka
+      MirrorDB: 202.122.37.75
+      JobOption: 
+        - /home/suo72/cepc_work/workfiles/template/simu.macro
+        - /home/suo72/cepc_work/workfiles/template/event.macro
+      ReturnData: true
+    - Type: Rec 
+      Executable: Marlin
+      JobOption:
+        - /home/suo72/cepc_work/workfiles/template/reco.xml
+        - /home/suo72/cepc_work/workfiles/template/PandoraLikelihoodData9EBin.xml
+        - /home/suo72/cepc_work/workfiles/template/PandoraSettingsDefault.xml
+      ReturnData: true
+      
+Splitter:
+  Type: ByFile
+  EventMaxPerJob: 20
+  SeedStart: auto
+  InputData: /home/suo72/cepc_work/stdhep/
+
+Backend:
+  Name: Condor
+  OutputDir: /home/suo72/cepc_work/output/1230
