@@ -2,6 +2,7 @@
 
 import click
 
+from jsub import version as jsub_version
 from jsub.config.config_loader import load_default, load_and_merge
 
 @click.group()
@@ -9,7 +10,7 @@ def cli():
     pass
 
 @cli.command()
-@click.option('--submit', help='Submit to backend after creation')
+@click.option('--backend', help='Backend to submit')
 @click.argument('config_file')
 def create(submit, config_file):
     click.echo('Creating')
@@ -29,7 +30,11 @@ def submit(task_id):
 @click.argument('task_id')
 def status(task_id):
     click.echo('Status')
-    j = Job.load()
+    t = Task.load()
+
+@cli.command()
+def version():
+    click.echo('jsub version %s' % jsub_version())
 
 def main():
     load_default()
