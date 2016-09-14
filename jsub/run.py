@@ -23,14 +23,14 @@ def create(submit, config_file):
 @click.argument('task_id')
 def submit(task_id):
     click.echo('Submitting')
-    t = Task.load(task_id)
-    t.submit()
+#    t = Task.load(task_id)
+#    t.submit()
 
 @cli.command()
 @click.argument('task_id')
 def status(task_id):
     click.echo('Status')
-    t = Task.load()
+#    t = Task.load()
 
 @cli.command()
 def version():
