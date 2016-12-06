@@ -1,0 +1,5 @@
+boss: output file name should be a temp one and then rename
+      then aborted jobs will not get the broken output file
+
+A lot of small functions are not associated with class instance.
+But use staticmethod is too verbose. Use function in method or something?

@@ -1,8 +1,8 @@
-import yaml
+import toml
 
 def file_ext():
-    return ['yaml', 'yml']
+    return ['toml']
 
 def load(config_file):
     with open(config_file, 'r') as f:
-        return yaml.load(f.read())
+        return toml.load(f.read())

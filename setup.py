@@ -25,6 +25,7 @@ setup(
     install_requires = [
         'click',
         'PyYAML',
+        'pytoml',
     ],
     tests_require = [
         'pytest',

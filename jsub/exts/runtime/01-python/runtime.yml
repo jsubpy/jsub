@@ -1,0 +1,3 @@
+config_format: yaml
+executable: run
+before_delivery: make
