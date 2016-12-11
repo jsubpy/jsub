@@ -275,6 +275,7 @@ class UnitThread(threading.Thread):
             except:
                 e = sys.exc_info()
                 jsub_logger.exception('Thread "%s" exception (%s): %s' % (self.__unit, e[0].__name__, e[1]))
+                self.__queue_pid.put(0)
         finally:
             self.__queue_unit.put({'unit': self.__unit, 'returncode': returncode, 'stdout': stdout, 'stderr': stderr})
 
