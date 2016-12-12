@@ -39,7 +39,7 @@ do
 done
 
 # execution of script
-(time eval $script_path $JSUB_argument $job_args) 1>$out 2>$err
+(time eval \"$script_path\" $JSUB_argument $job_args) 1>"$out" 2>"$err"
 
 # save the exit code
 result=$?

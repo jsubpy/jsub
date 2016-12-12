@@ -16,7 +16,7 @@ work_root="${job_root}/work"
 input_root="${job_root}/input"
 output_root="${job_root}/output"
 
-mkdir -p $log_root
+mkdir -p "$log_root"
 
 
 log_file="${log_root}/bootstrap.log"
@@ -51,7 +51,7 @@ logging "Using runtime: `basename ${runtime}`"
 
 logging 'Running the main program...'
 
-${runtime}/run "--job_root=${job_root}" "--config_root=${config_root}" "--log_root=${log_root}" "--module_root=${module_root}" \
+"${runtime}/run" "--job_root=${job_root}" "--config_root=${config_root}" "--log_root=${log_root}" "--module_root=${module_root}" \
     "--work_root=${work_root}" "--input_root=${input_root}" "--output_root=${output_root}"
 exit_code=$?
 
