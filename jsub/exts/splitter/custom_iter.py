@@ -1,7 +1,7 @@
 def load_func(func):
     return None
 
-class CustomFunc():
+class CustomIter(object):
     def __init__(self, func):
         self._func = func
 

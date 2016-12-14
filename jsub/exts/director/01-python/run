@@ -75,7 +75,7 @@ def add_file_logger(log_root):
     logger = logging.getLogger('JSUB')
 
     mkdir_safe(log_root)
-    log_file = os.path.join(log_root, 'runtime.log')
+    log_file = os.path.join(log_root, 'director.log')
 
     fh = logging.FileHandler(log_file)
     fh.setLevel(logging.DEBUG)
@@ -91,7 +91,7 @@ add_stream_logger()
 # Parse arguments
 
 class ArgParser:
-    sub_roots = ['config', 'log', 'module', 'work', 'input', 'output']
+    sub_roots = ['config', 'log', 'module', 'run', 'input', 'output']
 
     def __init__(self, argv):
         self.validation = False
@@ -101,7 +101,7 @@ class ArgParser:
         self.__parse_args()
 
     def __parse_args(self):
-        long_opts = ['validate', 'job_root=']
+        long_opts = ['validate', 'task_sub_id=', 'main_root=']
         for sub_root in self.sub_roots:
             long_opts.append(sub_root + '_root=')
 
@@ -113,12 +113,12 @@ class ArgParser:
             self.validation = True
             del self.options['validate']
 
-        if 'job_root' not in self.options:
-            self.options['job_root'] = '.'
+        if 'main_root' not in self.options:
+            self.options['main_root'] = '.'
         for sub_root in self.sub_roots:
             option_sub_root = sub_root + '_root'
             if option_sub_root not in self.options:
-                self.options[option_sub_root] = os.path.join(self.options['job_root'], sub_root)
+                self.options[option_sub_root] = os.path.join(self.options['main_root'], sub_root)
 
         self.options['config_file'] = os.path.join(self.options['config_root'], 'config.py')
 
@@ -132,9 +132,18 @@ class ArgParser:
         finally:
             f.close()
 
+        config['general']['task_sub_id'] = self.options['task_sub_id']
+        config['general']['main_root'] = self.options['main_root']
+
         for sub_root in self.sub_roots:
             option_sub_root = sub_root + '_root'
             config['general'][option_sub_root] = self.options[option_sub_root]
+
+        config['general']['log_unit_root'] = os.path.join(self.options['log_root'], 'unit')
+        mkdir_safe(config['general']['log_unit_root'])
+
+        config['general']['input_common_dir'] = os.path.join(self.options['input_root'], 'common')
+        config['general']['input_unit_root']  = os.path.join(self.options['input_root'], 'unit')
 
         return config
 
@@ -294,25 +303,15 @@ class UnitThread(threading.Thread):
 class UnitRunner:
     def __init__(self, config_general):
         self.__config_general = config_general
-
         self.__unit_threads = {}
-
         self.__queue_unit = Queue()
 
     def __prepare_args_basic(self, unit, module):
         args = []
-
         module_type = module.get('type', unit)
         executable = module.get('executable', module_type)
         args.append(os.path.join(self.__config_general['module_root'], module_type, executable))
-        args += module.get('argument', [])
-
         return args
-
-    def __prepare_cwd(self, unit):
-        cwd = os.path.join(self.__config_general['work_root'], unit)
-        mkdir_safe(cwd)
-        return cwd
 
     def __var_2_env(self, var):
         env = {}
@@ -371,12 +370,12 @@ class UnitRunner:
         jsub_logger.debug(' - Passed by arg: %s', var_arg)
         jsub_logger.debug(' - Passed by pipe: %s', var_pipe)
 
-        # generate params for UnitThread
+        # generate args for UnitThread
         args_basic = self.__prepare_args_basic(unit, data['module'])
-        args_param = self.__var_2_arg(var_arg)
-        args = args_basic + args_param
+        args_var   = self.__var_2_arg(var_arg)
+        args = args_basic + args_var
 
-        cwd = self.__prepare_cwd(unit)
+        cwd = data['sysvar']['run_dir']
 
         env = os.environ.copy()
         env.update(self.__var_2_env(var_env))
@@ -384,6 +383,7 @@ class UnitRunner:
         stdin = self.__var_2_stdin(var_pipe)
 
         # create thread for a unit
+        mkdir_safe(data['sysvar']['run_dir'])
         mkdir_safe(data['sysvar']['log_dir'])
         self.__unit_threads[unit] = UnitThread(self.__queue_unit, unit, args, cwd, env, stdin)
         self.__unit_threads[unit].start()
@@ -399,7 +399,7 @@ class UnitRunner:
 
     def __process_jsub_outvar(self, stdout):
         var = {}
-        r = re.compile('^\s*JSUB_([A-Z]+)_(\w+)\s*=\s*(.*)\s*$', flags=re.MULTILINE)
+        r = re.compile('^[ \t]*JSUB_([A-Z]+)_(\w+)[ \t]*=[ \t]*(.*)[ \t]*$', flags=re.MULTILINE)
         for m in r.finditer(stdout):
             var_type = m.group(1).lower()
             jsub_logger.debug('Find jsub %s variable: %s', var_type, m.groups())
@@ -478,12 +478,22 @@ class UnitRunner:
         return killed_units
 
 
+class TaskSubIdNotFoundError(Exception):
+    pass
+
+
 class Application:
     def __init__(self, config):
-        self.__config_general  = config.get('general',  {})
-        self.__config_jobvar   = config.get('jobvar',   {})
-        self.__config_workflow = config.get('workflow', {})
-        self.__config_event    = config.get('event',    {})
+        self.__config_general  = config['general']
+
+        task_sub_id = int(self.__config_general['task_sub_id'])
+        all_jobvar = config['jobvar']
+        if task_sub_id not in all_jobvar:
+            raise TaskSubIdNotFoundError('Task sub ID not found: %s', task_sub_id)
+        self.__config_jobvar   = all_jobvar[task_sub_id]
+
+        self.__config_workflow = config['workflow']
+        self.__config_event    = config['event']
 
         self.__data_workflow = {}
         for unit in self.__config_workflow:
@@ -499,8 +509,9 @@ class Application:
     def __init_sysvar(self, unit):
         sysvar = self.__config_general.copy()
         sysvar['unit'] = unit
-        sysvar['log_dir'] = os.path.join(self.__config_general['log_root'], unit)
-        sysvar['work_dir'] = os.path.join(self.__config_general['work_root'], unit)
+        sysvar['log_dir'] = os.path.join(self.__config_general['log_unit_root'], unit)
+        sysvar['run_dir'] = os.path.join(self.__config_general['run_root'], unit)
+        sysvar['input_dir'] = os.path.join(self.__config_general['input_unit_root'], unit)
         return sysvar
 
 
@@ -551,7 +562,7 @@ class Application:
 ################################################################################
 # Main
 
-def validate_runtime_env():
+def validate_director_env():
     return True
 
 def main():
@@ -559,7 +570,7 @@ def main():
         arg_parser = ArgParser(sys.argv[1:])
 
         if arg_parser.validation:
-            if validate_runtime_env():
+            if validate_director_env():
                 return 0
             else:
                 return 1
@@ -575,7 +586,7 @@ def main():
         app.run()
     except:
         e = sys.exc_info()
-        jsub_logger.exception('Unresolved exception (%s): %s' % (e[0].__name__, e[1]))
+        jsub_logger.exception('Exception caught (%s): %s' % (e[0].__name__, e[1]))
         return 1
     return 0
 

@@ -1,4 +1,4 @@
-class Simple:
+class Simple(object):
     def __init__(self):
         pass
 

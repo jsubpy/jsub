@@ -11,10 +11,10 @@ fi
 out="$logdir/script.out"
 err="$logdir/script.err"
 
-if [ "$JSUB_location" == 'input' ]; then
-    script_path=${JSUB_input_root}/${JSUB_script}
+if [ "$JSUB_location" == 'common' ]; then
+    script_path=${JSUB_input_common_dir}/${JSUB_script}
 else
-    script_path=${current_dir}/${JSUB_script}
+    script_path=${JSUB_input_dir}/${JSUB_script}
 fi
 
 # pass accepted arguments to the script

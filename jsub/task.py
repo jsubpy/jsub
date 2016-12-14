@@ -1,6 +1,6 @@
 import datetime
 
-class Task:
+class Task(object):
     def __init__(self, repo, data={}):
         self.__repo = repo
         self.data = data
@@ -12,12 +12,12 @@ class Task:
         self.__repo.save_task(self.data)
 
 
-class TaskPool:
+class TaskPool(object):
     def __init__(self, repo):
         self.__repo = repo
 
-    def create(self, props={}):
-        task = Task(self.__repo, {'props': props})
+    def create(self, workflow={}, prop={}, jobvar=[], input_file=[]):
+        task = Task(self.__repo, {'workflow': workflow, 'jobvar': jobvar, 'prop': prop, 'input': input_file})
         task.save()
         return task
 
@@ -32,6 +32,7 @@ class TaskPool:
         data = self.__repo.task_data(task_id)
         return Task(self.__repo, data)
 
-class Job:
-    def __init__(self, repo, props={}):
+
+class Job(object):
+    def __init__(self, repo, prop={}):
         pass

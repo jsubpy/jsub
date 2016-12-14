@@ -2,12 +2,12 @@ import re
 import importlib
 import inspect
 
-def camel_to_lower(name):
-    return name.lower()
-
 def camel_to_snake(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+def snake_to_camel(name):
+    return name.title().replace('_', '')
 
 
 class ModuleNotFoundError(Exception):
@@ -20,7 +20,7 @@ class NotAClassError(Exception):
     pass
 
 
-class Loader:
+class Loader(object):
     def __init__(self, extensions):
         self.__extensions = extensions
 
@@ -57,3 +57,13 @@ class Loader:
 
     def load_instance(self, category, class_name, module_name = ''):
         return self.load_class(category, class_name, module_name)()
+
+    def load(self, category, load_dict):
+        if 'type' not in load_dict:
+            raise LoadTypeMissingError('Load type missing for category "%s"' % category)
+
+        load_param = load_dict.get('param', {})
+        module_name = load_dict['type']
+        class_name = snake_to_camel(module_name)
+        class_load = self.load_class(category, class_name, module_name)
+        return class_load(load_param)

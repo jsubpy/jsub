@@ -1,2 +1,2 @@
-class DiracTask:
+class DiracTask(object):
     pass
