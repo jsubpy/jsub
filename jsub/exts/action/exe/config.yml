@@ -1,0 +1,9 @@
+action:
+  executable: exe.sh
+  cpu_core: 0
+  ignore_error: True
+  pass_var:
+    sysvar: JSUB_+env
+    jobvar: arg
+    provar: JSUB_+env
+    depvar: pipe

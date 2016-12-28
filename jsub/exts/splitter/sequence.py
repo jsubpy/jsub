@@ -1,4 +1,4 @@
-from jsub.exception import SplitterParamError
+from jsub.error import SplitterParamError
 
 class Sequence(object):
     def __init__(self, param):

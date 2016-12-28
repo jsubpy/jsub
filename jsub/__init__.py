@@ -1,39 +1,52 @@
+import os
+
 from jsub.operation import Operation
 
-__version__ = '0.1.0'
 
-def version():
-    return __version__
+class Jsub(object):
+    def __init__(self, jsubrc='~/.jsubrc'):
+        self.__jsubrc = jsubrc
+        self.__operation = None
+        self.__root_dir = os.path.dirname(os.path.realpath(__file__))
+
+    def __load_operation(self):
+        if self.__operation is None:
+            self.__operation = Operation(self.__jsubrc, self.__root_dir)
+        return self.__operation
 
 
-def create(task_profile):
-    op = Operation()
-    return op.create(task_profile)
+    def version(self):
+        with open(os.path.join(self.__root_dir, 'VERSION'), 'r') as f:
+            ver = f.read()
+        return ver.strip()
 
+    def create(self, task_profile):
+        op = self.__load_operation()
+        return op.create(task_profile)
 
-def submit(task_id, task_sub_id=[], dry_run=False):
-    op = Operation()
-    return op.submit(task_id=task_id, task_sub_id=task_sub_id, dry_run=dry_run)
+    def submit(self, task, dry_run=False):
+        op = self.__load_operation()
+        return op.submit(task=task, dry_run=dry_run)
 
-def list(task_id=None):
-    op = Operation()
-    return op.list(task_id)
+    def list(self, task_id=None):
+        op = self.__load_operation()
+        return op.list(task_id)
 
-def show(task_id):
-    op = Operation()
-    return op.list(task_id)
+    def show(self, task_id):
+        op = self.__load_operation()
+        return op.list(task_id)
 
-def resubmit(task_id):
-    op = Operation()
-    return op.resubmit(task_id)
+    def resubmit(self, task_id):
+        op = self.__load_operation()
+        return op.resubmit(task_id)
 
-def reschedule(task_id):
-    op = Operation()
-    return op.reschedule(task_id)
+    def reschedule(self, task_id):
+        op = self.__load_operation()
+        return op.reschedule(task_id)
 
-def export(task_id, task_sub_id=[], output_dir='.', task_profile_format='yaml'):
-    ''' Export job files (task_profile and input) for a task/job
-        User can modify the files and submit again, with a special app
-    '''
-    op = Operation()
-    return op.recreate(task_id=task_id, task_sub_id=task_sub_id, output_dir=output_dir, task_profile_format=task_profile_format)
+    def export(self, task_id, task_sub_id=[], output_dir='.', task_profile_format='yaml'):
+        ''' Export job files (task_profile and input) for a task/job
+            User can modify the files and submit again, with a common app
+        '''
+        op = self.__load_operation()
+        return op.recreate(task_id=task_id, task_sub_id=task_sub_id, output_dir=output_dir, task_profile_format=task_profile_format)

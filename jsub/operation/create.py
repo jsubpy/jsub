@@ -1,80 +1,71 @@
-from jsub.operation.exception import AppNotSetupError, SplitterNotSetupError
-
-from jsub.task import TaskPool
+import os
+import yaml
 
 class Create(object):
-    def __init__(self, task_profile, loader, task_pool, content):
+    def __init__(self, manager, task_profile):
+        self.__manager      = manager
         self.__task_profile = task_profile
-        self.__loader       = loader
-        self.__task_pool    = task_pool
-        self.__content      = content
+
+        self.__initialize_manager()
+
+    def __initialize_manager(self):
+        self.__config_mgr   = self.__manager.load_config_manager()
+
+        self.__app_mgr      = self.__manager.load_app_manager()
+        self.__splitter_mgr = self.__manager.load_splitter_manager()
+        self.__backend_mgr  = self.__manager.load_backend_manager()
+
 
     def handle(self):
-        app = self.__load_app()
+        task_name = self.__config_mgr.task_name(self.__task_profile)
 
-        app_data = app.build()
+        backend_data = self.__config_mgr.backend_data(self.__task_profile)
+        backend_property = self.__backend_mgr.property(backend_data)
 
-        app_input = app_data.get('input',    {})
-        workflow  = app_data.get('workflow', {})
-        prop      = app_data.get('prop',     {})
-        splitter  = app_data.get('splitter', {})
+        app_data = self.__config_mgr.app_data(self.__task_profile)
+        app_result = self.__app_mgr.build(app_data, backend_property)
 
-        all_jobvar = self.__split(splitter)
-        all_app_input = list(app_input.keys())
+        app_input = app_result.get('input',    {})
+        workflow  = app_result.get('workflow', {})
+        prop      = app_result.get('prop',     {})
+        splitter  = app_result.get('splitter', {})
 
-        task_id = self.__create_task(workflow, prop, all_jobvar, all_app_input)
+        jobvar = self.__splitter_mgr.split(splitter)
+
+        task_data = {}
+        task_data['name']       = task_name
+        task_data['app']        = app_data
+        task_data['workflow']   = workflow
+        task_data['prop']       = prop
+        task_data['splitter']   = splitter
+        task_data['jobvar']     = jobvar
+        task_data['input_file'] = list(app_input.keys())
+        task_data['backend']    = backend_data
+        task = self.__create_task(task_data)
+        task_id = task.data['task_id']
 
         self.__copy_input_file(task_id, app_input)
+        self.__dump_task_profile(task_id)
 
-        return task_id
+        return task
 
 
-    def __load_app(self):
-        if 'app' not in self.__task_profile:
-            raise AppNotSetupError('Must setup an app in task profile')
-
-        app_type   = self.__task_profile['app']
-        app_param = self.__task_profile.get('param', {})
-
-        return self.__loader.load('app', {'type': app_type, 'param': app_param})
-
-    def __jobvar_name_map(self, jobvar_single, name_map):
-        jobvar_new = {}
-        for k, v in jobvar_single.items():
-            if k in name_map:
-                jobvar_new[name_map[k]] = v
-            else:
-                jobvar_new[k] = v
-        return jobvar_new
-
-    def __split(self, all_splitter):
-        splitter_content = {}
-        for splitter, value in all_splitter.items():
-            if 'type' not in value:
-                raise SplitterNotSetupError('Splitter type not setup: %s', splitter)
-
-            splitter_content[splitter] = {}
-            splitter_content[splitter]['instance'] = self.__loader.load('splitter', value)
-            splitter_content[splitter]['name_map'] = value.get('name_map', {})
-
-        all_jobvar = []
-        split_finished = False
-        while True:
-            jobvar = {}
-            try:
-                for splitter, content in splitter_content.items():
-                    jobvar_single = content['instance'].next()
-                    jobvar.update(self.__jobvar_name_map(jobvar_single, content['name_map']))
-            except StopIteration:
-                break
-            all_jobvar.append(jobvar)
-
-        return all_jobvar
-
-    def __create_task(self, workflow, prop, all_jobvar, all_app_input):
-        task = self.__task_pool.create(workflow, prop, all_jobvar, all_app_input)
-        return task.data['task_id']
+    def __create_task(self, task_data):
+        task_pool = self.__manager.load_task_pool()
+        return task_pool.create(**task_data)
 
     def __copy_input_file(self, task_id, app_input):
-        for dst, src in app_input.items():
-            self.__content.put(task_id, 'input', src, dst)
+        content = self.__manager.load_content()
+
+        if 'common' in app_input:
+            for dst, src in app_input['common'].items():
+                content.put(task_id, src, os.path.join('input', 'common', dst))
+
+        if 'unit' in app_input:
+            for unit, unit_file_pair in app_input['unit'].items():
+                for dst, src in unit_file_pair.items():
+                    content.put(task_id, src, os.path.join('input', 'unit', unit, dst))
+
+    def __dump_task_profile(self, task_id):
+        content = self.__manager.load_content()
+        content.put_str(task_id, yaml.dump(self.__task_profile), os.path.join('profile', 'origin'))

@@ -2,11 +2,9 @@ import os
 import json
 import fcntl
 
-ID_FILENAME = 'id'
+from jsub.util import safe_mkdir
 
-def _mkdir_p(directory):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+ID_FILENAME = 'id'
 
 class FileSystem(object):
     def __init__(self, param):
@@ -45,8 +43,8 @@ class FileSystem(object):
         return json.loads(data_str)
 
     def __create_repo_dir(self):
-        _mkdir_p(self.__repo_dir)
-        _mkdir_p(self.__task_dir)
+        safe_mkdir(self.__repo_dir)
+        safe_mkdir(self.__task_dir)
 
     def __new_task_id(self):
         with open(self.__id_file, 'a+') as f:

@@ -1,2 +1,0 @@
-class SplitterParamError(Exception):
-    pass

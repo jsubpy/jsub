@@ -11,9 +11,9 @@ main_root=`pwd`
 task_sub_id=$1
 work_root=$2
 
-director_root="${main_root}/director"
-config_root="${main_root}/config"
-module_root="${main_root}/module"
+navigator_root="${main_root}/navigator"
+scenario_root="${main_root}/scenario"
+action_root="${main_root}/action"
 input_root="${main_root}/input"
 
 log_root="${work_root}/log"
@@ -38,27 +38,27 @@ python_version_minor=`python -c "import sys;print(sys.version_info[1])"`
 logging "Python version: ${python_version_major}.${python_version_minor}"
 
 
-logging "Search for valid director..."
-for director_dir in ${director_root}/*
+logging "Search for valid navigator..."
+for navigator_dir in ${navigator_root}/*
 do
-    ${director_dir}/run --validate >/dev/null 2>&1
-    if [ $? = 0 ]; then
-        director=$director_dir
+    navigator_ok=`${navigator_dir}/run --validate 2>/dev/null`
+    if [ $? = 0 -a "$navigator_ok" = 'JSUB navigator OK' ]; then
+        navigator=$navigator_dir
         break
     fi
 done
 
-if [ -z "$director" ]; then
-    logging 'ERROR: No available director found!'
+if [ -z "$navigator" ]; then
+    logging 'ERROR: No available navigator found!'
     exit 1
 fi
 
-logging "Running the director: `basename ${director}`..."
+logging "Running the navigator: `basename ${navigator}`..."
 
-"${director}/run" "--task_sub_id=${task_sub_id}" \
-    "--main_root=${main_root}" "--config_root=${config_root}" "--log_root=${log_root}" "--module_root=${module_root}" \
+"${navigator}/run" "--task_sub_id=${task_sub_id}" \
+    "--main_root=${main_root}" "--scenario_root=${scenario_root}" "--log_root=${log_root}" "--action_root=${action_root}" \
     "--run_root=${run_root}" "--input_root=${input_root}" "--output_root=${output_root}"
 exit_code=$?
 
-logging "Finished the director with exit code $exit_code"
+logging "Finished the navigator with exit code $exit_code"
 exit $exit_code

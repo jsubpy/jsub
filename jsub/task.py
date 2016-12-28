@@ -16,8 +16,9 @@ class TaskPool(object):
     def __init__(self, repo):
         self.__repo = repo
 
-    def create(self, workflow={}, prop={}, jobvar=[], input_file=[]):
-        task = Task(self.__repo, {'workflow': workflow, 'jobvar': jobvar, 'prop': prop, 'input': input_file})
+    def create(self, name='', app='', workflow={}, prop={}, splitter={}, jobvar=[], input_file=[], backend={}):
+        task = Task(self.__repo, {'name': name, 'app': app, 'workflow': workflow, 'prop': prop,
+            'splitter': splitter, 'jobvar': jobvar, 'input': input_file, 'backend': backend})
         task.save()
         return task
 
@@ -31,8 +32,3 @@ class TaskPool(object):
     def find(self, task_id):
         data = self.__repo.task_data(task_id)
         return Task(self.__repo, data)
-
-
-class Job(object):
-    def __init__(self, repo, prop={}):
-        pass

@@ -1,0 +1,7 @@
+action:
+  executable: cmd.sh
+  cpu_core: 0
+  ignore_error: True
+  pass_var:
+    sysvar: JSUB_+env
+    provar: JSUB_+env

@@ -75,7 +75,7 @@ def add_file_logger(log_root):
     logger = logging.getLogger('JSUB')
 
     mkdir_safe(log_root)
-    log_file = os.path.join(log_root, 'director.log')
+    log_file = os.path.join(log_root, 'navigator.log')
 
     fh = logging.FileHandler(log_file)
     fh.setLevel(logging.DEBUG)
@@ -91,7 +91,7 @@ add_stream_logger()
 # Parse arguments
 
 class ArgParser:
-    sub_roots = ['config', 'log', 'module', 'run', 'input', 'output']
+    sub_roots = ['scenario', 'log', 'action', 'run', 'input', 'output']
 
     def __init__(self, argv):
         self.validation = False
@@ -120,32 +120,32 @@ class ArgParser:
             if option_sub_root not in self.options:
                 self.options[option_sub_root] = os.path.join(self.options['main_root'], sub_root)
 
-        self.options['config_file'] = os.path.join(self.options['config_root'], 'config.py')
+        self.options['scenario_file'] = os.path.join(self.options['scenario_root'], 'scenario.py')
 
-    def read_config(self):
-        config = {}
+    def read_scenario(self):
+        scenario = {}
 
-        jsub_logger.debug('Reading configuration from file: %s', self.options['config_file'])
-        f = open(self.options['config_file'], 'r')
+        jsub_logger.debug('Reading scenario from file: %s', self.options['scenario_file'])
+        f = open(self.options['scenario_file'], 'r')
         try:
-            config = eval(f.read())
+            scenario = eval(f.read())
         finally:
             f.close()
 
-        config['general']['task_sub_id'] = self.options['task_sub_id']
-        config['general']['main_root'] = self.options['main_root']
+        scenario['general']['task_sub_id'] = self.options['task_sub_id']
+        scenario['general']['main_root'] = self.options['main_root']
 
         for sub_root in self.sub_roots:
             option_sub_root = sub_root + '_root'
-            config['general'][option_sub_root] = self.options[option_sub_root]
+            scenario['general'][option_sub_root] = self.options[option_sub_root]
 
-        config['general']['log_unit_root'] = os.path.join(self.options['log_root'], 'unit')
-        mkdir_safe(config['general']['log_unit_root'])
+        scenario['general']['log_unit_root'] = os.path.join(self.options['log_root'], 'unit')
+        mkdir_safe(scenario['general']['log_unit_root'])
 
-        config['general']['input_common_dir'] = os.path.join(self.options['input_root'], 'common')
-        config['general']['input_unit_root']  = os.path.join(self.options['input_root'], 'unit')
+        scenario['general']['input_common_dir'] = os.path.join(self.options['input_root'], 'common')
+        scenario['general']['input_unit_root']  = os.path.join(self.options['input_root'], 'unit')
 
-        return config
+        return scenario
 
 
 ################################################################################
@@ -301,16 +301,16 @@ class UnitThread(threading.Thread):
 
 
 class UnitRunner:
-    def __init__(self, config_general):
-        self.__config_general = config_general
+    def __init__(self, scenario_general):
+        self.__scenario_general = scenario_general
         self.__unit_threads = {}
         self.__queue_unit = Queue()
 
-    def __prepare_args_basic(self, unit, module):
+    def __prepare_args_basic(self, unit, action):
         args = []
-        module_type = module.get('type', unit)
-        executable = module.get('executable', module_type)
-        args.append(os.path.join(self.__config_general['module_root'], module_type, executable))
+        action_type = action.get('type', unit)
+        executable = action.get('executable', action_type)
+        args.append(os.path.join(self.__scenario_general['action_root'], action_type, executable))
         return args
 
     def __var_2_env(self, var):
@@ -337,7 +337,7 @@ class UnitRunner:
             return method_fragments
         return []
 
-    def __process_var(self, pass_method, method_fragments, var_data):
+    def __generate_sub_var(self, pass_method, method_fragments, var_data):
         var = {}
         for k, v in var_data.items():
             var_name = ''
@@ -351,12 +351,12 @@ class UnitRunner:
 
     def __generate_var(self, pass_method, data):
         var = {}
-        pass_var = data['module']['pass_var']
+        pass_var = data['action']['pass_var']
         for var_type, methods in pass_var.items():
             for method in methods:
                 method_fragments = self.__find_pass_method(pass_method, method)
                 if method_fragments:
-                    var.update(self.__process_var(pass_method, method_fragments, data[var_type]))
+                    var.update(self.__generate_sub_var(pass_method, method_fragments, data[var_type]))
         return var
 
     def __start_unit(self, unit, data):
@@ -371,7 +371,7 @@ class UnitRunner:
         jsub_logger.debug(' - Passed by pipe: %s', var_pipe)
 
         # generate args for UnitThread
-        args_basic = self.__prepare_args_basic(unit, data['module'])
+        args_basic = self.__prepare_args_basic(unit, data['action'])
         args_var   = self.__var_2_arg(var_arg)
         args = args_basic + args_var
 
@@ -397,7 +397,7 @@ class UnitRunner:
             self.__start_unit(unit, data)
 
 
-    def __process_jsub_outvar(self, stdout):
+    def __analyze_jsub_outvar(self, stdout):
         var = {}
         r = re.compile('^[ \t]*JSUB_([A-Z]+)_(\w+)[ \t]*=[ \t]*(.*)[ \t]*$', flags=re.MULTILINE)
         for m in r.finditer(stdout):
@@ -421,7 +421,7 @@ class UnitRunner:
     def __finished_unit(self):
         result = self.__wait_finished_unit()
         unit = result['unit']
-        outvar = self.__process_jsub_outvar(result['stdout'])
+        outvar = self.__analyze_jsub_outvar(result['stdout'])
 
         for var_type, var in outvar.items():
             for k, v in var.items():
@@ -483,35 +483,35 @@ class TaskSubIdNotFoundError(Exception):
 
 
 class Application:
-    def __init__(self, config):
-        self.__config_general  = config['general']
+    def __init__(self, scenario):
+        self.__scenario_general  = scenario['general']
 
-        task_sub_id = int(self.__config_general['task_sub_id'])
-        all_jobvar = config['jobvar']
+        task_sub_id = int(self.__scenario_general['task_sub_id'])
+        all_jobvar = scenario['jobvar']
         if task_sub_id not in all_jobvar:
             raise TaskSubIdNotFoundError('Task sub ID not found: %s', task_sub_id)
-        self.__config_jobvar   = all_jobvar[task_sub_id]
+        self.__scenario_jobvar   = all_jobvar[task_sub_id]
 
-        self.__config_workflow = config['workflow']
-        self.__config_event    = config['event']
+        self.__scenario_workflow = scenario['workflow']
+        self.__scenario_event    = scenario['event']
 
         self.__data_workflow = {}
-        for unit in self.__config_workflow:
+        for unit in self.__scenario_workflow:
             self.__data_workflow[unit] = {}
             self.__data_workflow[unit]['sysvar'] = self.__init_sysvar(unit)
-            self.__data_workflow[unit]['jobvar'] = self.__config_jobvar
-            self.__data_workflow[unit]['modvar'] = self.__config_workflow[unit]['modvar']
+            self.__data_workflow[unit]['jobvar'] = self.__scenario_jobvar
+            self.__data_workflow[unit]['actvar'] = self.__scenario_workflow[unit]['actvar']
             self.__data_workflow[unit]['depvar'] = {}
-            self.__data_workflow[unit]['module'] = self.__config_workflow[unit]['module']
+            self.__data_workflow[unit]['action'] = self.__scenario_workflow[unit]['action']
 
-        self.__unit_runner = UnitRunner(self.__config_general)
+        self.__unit_runner = UnitRunner(self.__scenario_general)
 
     def __init_sysvar(self, unit):
-        sysvar = self.__config_general.copy()
+        sysvar = self.__scenario_general.copy()
         sysvar['unit'] = unit
-        sysvar['log_dir'] = os.path.join(self.__config_general['log_unit_root'], unit)
-        sysvar['run_dir'] = os.path.join(self.__config_general['run_root'], unit)
-        sysvar['input_dir'] = os.path.join(self.__config_general['input_unit_root'], unit)
+        sysvar['log_dir'] = os.path.join(self.__scenario_general['log_unit_root'], unit)
+        sysvar['run_dir'] = os.path.join(self.__scenario_general['run_root'], unit)
+        sysvar['input_dir'] = os.path.join(self.__scenario_general['input_unit_root'], unit)
         return sysvar
 
 
@@ -521,10 +521,10 @@ class Application:
 
     def generate_dag(self):
         dag = DAG()
-        for unit in self.__config_workflow:
+        for unit in self.__scenario_workflow:
             dag.add_vertex(unit)
-        for unit, config_unit in self.__config_workflow.items():
-            for unit_from in config_unit.get('depend_on', []):
+        for unit, scenario_unit in self.__scenario_workflow.items():
+            for unit_from in scenario_unit.get('depend_on', []):
                 jsub_logger.debug('Add direction for DAG: %s -> %s', unit_from, unit)
                 dag.add_edge(unit_from, unit)
         self.__dag_workflow = dag
@@ -562,7 +562,8 @@ class Application:
 ################################################################################
 # Main
 
-def validate_director_env():
+def validate_navigator_env():
+    print('JSUB navigator OK')
     return True
 
 def main():
@@ -570,7 +571,7 @@ def main():
         arg_parser = ArgParser(sys.argv[1:])
 
         if arg_parser.validation:
-            if validate_director_env():
+            if validate_navigator_env():
                 return 0
             else:
                 return 1
@@ -579,10 +580,10 @@ def main():
         add_file_logger(options['log_root'])
         jsub_logger.debug('Parse arguments to options: %s', options)
 
-        config = arg_parser.read_config()
-        jsub_logger.debug('Read configuration: %s', config)
+        scenario = arg_parser.read_scenario()
+        jsub_logger.debug('Read scenario: %s', scenario)
 
-        app = Application(config)
+        app = Application(scenario)
         app.run()
     except:
         e = sys.exc_info()
