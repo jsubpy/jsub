@@ -33,7 +33,7 @@ def create(ctx, task_profile_file):
 
 @cli.command()
 @click.option('--dry-run', is_flag=True, help='Create necessary files without final submission')
-@click.argument('task_id')
+@click.argument('task_id', type=int)
 @click.pass_context
 def submit(ctx, dry_run, task_id):
     click.echo('Submitting')
@@ -58,7 +58,7 @@ def run(ctx, dry_run, task_profile_file):
 
 
 @cli.command()
-@click.argument('task_id')
+@click.argument('task_id', type=int)
 @click.pass_context
 def show(ctx, task_id):
     click.echo('Show')
