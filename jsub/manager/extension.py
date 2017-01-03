@@ -1,15 +1,11 @@
 import os
 
-from jsub.error import JsubError
+from jsub.manager.error import ExtensionNotFoundError
 
 from jsub.loader import load_class, module_dir
 from jsub.loader import LoadError
 
 from jsub.util import snake_to_camel
-
-
-class ExtensionNotFoundError(JsubError):
-    pass
 
 
 class ExtensionManager(object):

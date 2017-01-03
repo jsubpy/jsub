@@ -5,5 +5,5 @@ action:
   pass_var:
     sysvar: JSUB_+env
     jobvar: arg
-    provar: JSUB_+env
+    actvar: JSUB_+env
     depvar: pipe

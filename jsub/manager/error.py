@@ -1,6 +1,11 @@
 from jsub.error import JsubError
 
 
+class ExtensionNotFoundError(JsubError):
+    pass
+
+
+
 class ConfigNotSetupError(JsubError):
     pass
 

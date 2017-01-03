@@ -6,11 +6,11 @@ else
     logdir=`pwd`
 fi
 
-out="$logdir/command.out"
-err="$logdir/command.err"
+out="$logdir/cmd.out"
+err="$logdir/cmd.err"
 
 # execution of command
-cmd=$JSUB_command
+cmd=$JSUB_cmd
 eval $cmd 1>"$out" 2>"$err"
 
 # save the exit code

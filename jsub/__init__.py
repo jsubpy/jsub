@@ -20,13 +20,14 @@ class Jsub(object):
             ver = f.read()
         return ver.strip()
 
+
     def create(self, task_profile):
         op = self.__load_operation()
         return op.create(task_profile)
 
-    def submit(self, task, dry_run=False):
+    def submit(self, task, job_ids=None, dry_run=False):
         op = self.__load_operation()
-        return op.submit(task=task, dry_run=dry_run)
+        return op.submit(task, job_ids, dry_run)
 
     def list(self, task_id=None):
         op = self.__load_operation()
@@ -43,6 +44,14 @@ class Jsub(object):
     def reschedule(self, task_id):
         op = self.__load_operation()
         return op.reschedule(task_id)
+
+    def merge(self, task_id):
+        op = self.__load_operation()
+        return op.merge(task_id)
+
+    def output(self, task_id):
+        op = self.__load_operation()
+        return op.output(task_id)
 
     def export(self, task_id, task_sub_id=[], output_dir='.', task_profile_format='yaml'):
         ''' Export job files (task_profile and input) for a task/job

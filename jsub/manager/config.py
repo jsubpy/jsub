@@ -76,4 +76,6 @@ class ConfigManager(object):
         backend_param = self.__config.get('backends', {}).get(backend_name, {}).get('param')
 #        backend_param.update(backend_param_profile)
 
+        backend_param['default_work_dir'] = self.__config.get('work_dir', '~/jsub/work')
+
         return {'type': backend_type, 'param': backend_param}

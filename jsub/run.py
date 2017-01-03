@@ -39,7 +39,7 @@ def submit(ctx, dry_run, task_id):
     click.echo('Submitting')
 
     j = Jsub(ctx.obj['jsubrc'])
-    j.submit(task_id, dry_run)
+    j.submit(task_id, dry_run=dry_run)
 
 
 @cli.command()
@@ -52,7 +52,7 @@ def run(ctx, dry_run, task_profile_file):
     j = Jsub(ctx.obj['jsubrc'])
     task_profile = load_config_file(task_profile_file)
     task = j.create(task_profile)
-    j.submit(task, dry_run)
+    j.submit(task, dry_run=dry_run)
 
     click.echo('Task %s submitted: %s' % (task.data['task_id'], task.data['name']))
 

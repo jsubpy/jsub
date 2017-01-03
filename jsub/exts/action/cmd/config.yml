@@ -4,4 +4,4 @@ action:
   ignore_error: True
   pass_var:
     sysvar: JSUB_+env
-    provar: JSUB_+env
+    actvar: JSUB_+env

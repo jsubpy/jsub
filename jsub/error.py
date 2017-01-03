@@ -3,3 +3,6 @@ class JsubError(Exception):
 
 class SplitterParamError(JsubError):
     pass
+
+class LauncherNotFoundError(JsubError):
+    pass

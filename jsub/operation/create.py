@@ -36,6 +36,7 @@ class Create(object):
         task_data['name']       = task_name
         task_data['app']        = app_data
         task_data['workflow']   = workflow
+        task_data['event']      = {}
         task_data['prop']       = prop
         task_data['splitter']   = splitter
         task_data['jobvar']     = jobvar

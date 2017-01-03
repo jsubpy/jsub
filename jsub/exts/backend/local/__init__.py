@@ -8,12 +8,12 @@ run_on_foregroud = True
 
 import os
 
-class Local(object):
+from jsub.mixin.backend.common import Common
+
+class Local(Common):
     def __init__(self, param):
-        self.__work_dir = os.path.expanduser(param.get('work_dir'))
+        self._param = param
+        self.initialize_param()
 
     def property(self):
         return {}
-
-    def main_work_dir(self, task_id):
-        return os.path.join(self.__work_dir, str(task_id), 'main')

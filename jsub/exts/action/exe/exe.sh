@@ -8,16 +8,16 @@ else
     logdir=$current_dir
 fi
 
-out="$logdir/script.out"
-err="$logdir/script.err"
+out="$logdir/exe.out"
+err="$logdir/exe.err"
 
 if [ "$JSUB_location" == 'common' ]; then
-    script_path=${JSUB_input_common_dir}/${JSUB_script}
+    exe_path=${JSUB_input_common_dir}/${JSUB_exe}
 else
-    script_path=${JSUB_input_dir}/${JSUB_script}
+    exe_path=${JSUB_input_dir}/${JSUB_exe}
 fi
 
-# pass accepted arguments to the script
+# pass accepted arguments to the exe
 job_args=''
 save_value=0
 for arg in "$@"
@@ -38,8 +38,8 @@ do
     done
 done
 
-# execution of script
-(time eval \"$script_path\" $JSUB_argument $job_args) 1>"$out" 2>"$err"
+# execution of exe
+(time eval \"$exe_path\" $JSUB_argument $job_args) 1>"$out" 2>"$err"
 
 # save the exit code
 result=$?
