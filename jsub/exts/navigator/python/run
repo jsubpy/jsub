@@ -281,7 +281,7 @@ class UnitThread(threading.Thread):
                 stdout = stdout.decode()
                 stderr = stderr.decode()
                 returncode = p.returncode
-            except:
+            except Exception:
                 e = sys.exc_info()
                 jsub_logger.exception('Thread "%s" exception (%s): %s' % (self.__unit, e[0].__name__, e[1]))
                 self.__queue_pid.put(0)
@@ -585,7 +585,7 @@ def main():
 
         app = Application(scenario)
         app.run()
-    except:
+    except Exception:
         e = sys.exc_info()
         jsub_logger.exception('Exception caught (%s): %s' % (e[0].__name__, e[1]))
         return 1

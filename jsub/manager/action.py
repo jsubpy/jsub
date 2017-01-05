@@ -25,8 +25,8 @@ class ActionManager(object):
         for action in actions:
             action_dir = self.__ext_mgr.ext_dir('action', action)
             action_config = self.__action_config(action_dir)
-
             executable = action_config['action'].get('executable', 'run')
+
             src_exe = os.path.join(action_dir, executable)
             dst_exe = os.path.join(dst_dir, action, executable)
             safe_copy(src_exe, dst_exe)

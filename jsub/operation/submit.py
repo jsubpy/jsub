@@ -5,14 +5,14 @@ from jsub.util import safe_mkdir
 from jsub.util import safe_copy
 
 class Submit(object):
-    def __init__(self, manager, task, job_ids=None, dry_run=False):
+    def __init__(self, manager, task, sub_ids=None, dry_run=False):
         self.__manager = manager
         self.__task    = self.__manager.load_task(task)
-        self.__job_ids = job_ids
+        self.__sub_ids = sub_ids
         self.__dry_run = dry_run
 
-        if self.__job_ids is None:
-            self.__job_ids = list(range(len(self.__task.data['jobvar'])))
+        if self.__sub_ids is None:
+            self.__sub_ids = list(range(len(self.__task.data['jobvar'])))
 
         self.__initialize_manager()
 
@@ -27,6 +27,8 @@ class Submit(object):
 
 
     def handle(self):
+        self.__backend_mgr.clean_work_dir(self.__task.data['backend'], self.__task.data['task_id'])
+
         main_work_dir = self.__backend_mgr.main_work_dir(self.__task.data['backend'], self.__task.data['task_id'])
 
         safe_mkdir(main_work_dir)
@@ -43,7 +45,8 @@ class Submit(object):
 
 
     def __create_bootstrap(self, main_work_dir):
-        self.__bootstrap_mgr.create_bootstrap(main_work_dir)
+        bootstrap = self.__config_mgr.bootstrap()
+        self.__bootstrap_mgr.create_bootstrap(bootstrap, main_work_dir)
 
     def __create_navigator(self, main_work_dir):
         navigator_dir = os.path.join(main_work_dir, 'navigator')
@@ -80,3 +83,5 @@ class Submit(object):
     def __submit(self):
         if self.__dry_run:
             return
+        result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['task_id'], self.__sub_ids)
+        print(result)

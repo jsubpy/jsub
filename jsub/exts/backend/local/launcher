@@ -18,4 +18,4 @@ job_work_root="${task_work_root}/${task_sub_id_start}"
 mkdir -p ${job_work_root}
 cd ${job_work_root}
 
-${launch_dir}/main/bootstrap.sh ${task_sub_id} ${job_work_root}
+${launch_dir}/main/bootstrap ${task_sub_id} ${job_work_root}

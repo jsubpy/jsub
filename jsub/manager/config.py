@@ -36,6 +36,11 @@ class ConfigManager(object):
         config_content['param'] = {'dir': '~/jsub/repo'}
         return config_content
 
+    def bootstrap(self):
+        if 'bootstrap' in self.__config:
+            return self.__config['bootstrap']
+        return 'shell'
+
     def navigator(self):
         if 'navigator' in self.__config:
             return self.__config['navigator']

@@ -14,6 +14,6 @@ class Operation(object):
         handler = Create(self.__manager, task_profile)
         return handler.handle()
 
-    def submit(self, task, job_ids=None, dry_run=False):
-        handler = Submit(self.__manager, task, job_ids, dry_run)
+    def submit(self, task, sub_ids=None, dry_run=False):
+        handler = Submit(self.__manager, task, sub_ids, dry_run)
         return handler.handle()

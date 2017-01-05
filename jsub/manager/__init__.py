@@ -52,7 +52,7 @@ class Manager(object):
         return BackendManager(self.load_ext_manager())
 
     def load_bootstrap_manager(self):
-        return BootstrapManager(self.__root_dir)
+        return BootstrapManager(self.load_ext_manager())
 
     def load_navigator_manager(self):
         return NavigatorManager(self.load_ext_manager())

@@ -1,19 +1,19 @@
 import os
 import copy
 
+def _action_param(action_output, action_input):
+    for k, v in action_input.items():
+        if k == 'pass_var':
+            if k not in action_output:
+                action_output[k] = {}
+            for var, method in v.items():
+                action_output[k][var] = method if isinstance(method, list) else [method]
+        else:
+            action_output[k] = copy.deepcopy(v)
+
 class ScenarioManager(object):
     def __init__(self):
         pass
-
-    def __action_param(self, action_output, action_input):
-        for k, v in action_input.items():
-            if k == 'pass_var':
-                if k not in action_output:
-                    action_output[k] = {}
-                for var, method in v.items():
-                    action_output[k][var] = method if isinstance(method, list) else [method]
-            else:
-                action_output[k] = copy.deepcopy(v)
 
     def create_scenario_file(self, task_data, action_default, dst_dir):
         scenario = {}
@@ -28,8 +28,8 @@ class ScenarioManager(object):
             scenario['workflow'][unit]['depend_on'] = dep
 
             scenario['workflow'][unit]['action'] = {}
-            self.__action_param(scenario['workflow'][unit]['action'], action_default[unit].get('action', {}))
-            self.__action_param(scenario['workflow'][unit]['action'], param.get('action', {}))
+            _action_param(scenario['workflow'][unit]['action'], action_default[unit].get('action', {}))
+            _action_param(scenario['workflow'][unit]['action'], param.get('action', {}))
 
             scenario['workflow'][unit]['actvar'] = copy.deepcopy(action_default[unit].get('actvar', {}))
             scenario['workflow'][unit]['actvar'].update(param.get('actvar', {}))

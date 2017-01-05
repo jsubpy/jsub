@@ -16,10 +16,8 @@ class TaskPool(object):
     def __init__(self, repo):
         self.__repo = repo
 
-    def create(self, name='', app='', workflow={}, event={}, prop={}, splitter={}, jobvar=[], input_file=[], backend={}):
-        task = Task(self.__repo, {'name': name, 'app': app,
-            'workflow': workflow, 'event': event, 'prop': prop,
-            'splitter': splitter, 'jobvar': jobvar, 'input': input_file, 'backend': backend})
+    def create(self, task_data):
+        task = Task(self.__repo, task_data)
         task.save()
         return task
 

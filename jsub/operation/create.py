@@ -42,6 +42,7 @@ class Create(object):
         task_data['jobvar']     = jobvar
         task_data['input_file'] = list(app_input.keys())
         task_data['backend']    = backend_data
+        task_data['status']     = 'NEW'
         task = self.__create_task(task_data)
         task_id = task.data['task_id']
 
@@ -53,7 +54,7 @@ class Create(object):
 
     def __create_task(self, task_data):
         task_pool = self.__manager.load_task_pool()
-        return task_pool.create(**task_data)
+        return task_pool.create(task_data)
 
     def __copy_input_file(self, task_id, app_input):
         content = self.__manager.load_content()

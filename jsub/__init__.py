@@ -25,9 +25,9 @@ class Jsub(object):
         op = self.__load_operation()
         return op.create(task_profile)
 
-    def submit(self, task, job_ids=None, dry_run=False):
+    def submit(self, task, sub_ids=None, dry_run=False):
         op = self.__load_operation()
-        return op.submit(task, job_ids, dry_run)
+        return op.submit(task, sub_ids, dry_run)
 
     def list(self, task_id=None):
         op = self.__load_operation()
