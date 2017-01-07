@@ -2,7 +2,6 @@ import os
 
 from jsub.operation import Operation
 
-
 class Jsub(object):
     def __init__(self, jsubrc='~/.jsubrc'):
         self.__jsubrc = jsubrc
@@ -13,12 +12,6 @@ class Jsub(object):
         if self.__operation is None:
             self.__operation = Operation(self.__jsubrc, self.__root_dir)
         return self.__operation
-
-
-    def version(self):
-        with open(os.path.join(self.__root_dir, 'VERSION'), 'r') as f:
-            ver = f.read()
-        return ver.strip()
 
 
     def create(self, task_profile):

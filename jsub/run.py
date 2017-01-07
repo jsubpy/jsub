@@ -2,9 +2,9 @@
 
 import click
 
-from jsub import Jsub
-
-from jsub.config import load_config_file
+from jsub         import Jsub
+from jsub.version import version as jsub_version
+from jsub.config  import load_config_file
 
 @click.group()
 @click.option('--jsubrc', default='~/.jsubrc', help='Path for jsubrc default configuration file')
@@ -15,7 +15,7 @@ def cli(ctx, jsubrc):
 
 @cli.command()
 def version():
-    click.echo('JSUB (Job Submission Utility Bundle) version %s' % Jsub().version())
+    click.echo('JSUB (Job Submission Utility Bundle) version %s' % jsub_version())
 
 
 @cli.command()
