@@ -3,7 +3,7 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-import jsub
+from jsub import Jsub
 
 class PyTest(TestCommand):
     user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
@@ -19,7 +19,7 @@ class PyTest(TestCommand):
 
 setup(
     name = 'jsub',
-    version = jsub.version(),
+    version = Jsub().version(),
     description = 'Job submission toolkit',
     packages = find_packages(),
     install_requires = [
