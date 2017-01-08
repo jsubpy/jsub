@@ -3,7 +3,6 @@
 import click
 
 from jsub         import Jsub
-from jsub.version import version as jsub_version
 from jsub.config  import load_config_file
 
 @click.group()
@@ -15,7 +14,7 @@ def cli(ctx, jsubrc):
 
 @cli.command()
 def version():
-    click.echo('JSUB (Job Submission Utility Bundle) version %s' % jsub_version())
+    click.echo('JSUB (Job Submission Utility Bundle) version %s' % Jsub().version())
 
 
 @cli.command()

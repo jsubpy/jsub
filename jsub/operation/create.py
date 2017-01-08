@@ -1,5 +1,6 @@
 import os
-import yaml
+
+from jsub.config import dump_config_string
 
 class Create(object):
     def __init__(self, manager, task_profile):
@@ -70,4 +71,4 @@ class Create(object):
 
     def __dump_task_profile(self, task_id):
         content = self.__manager.load_content()
-        content.put_str(task_id, yaml.dump(self.__task_profile), os.path.join('profile', 'origin'))
+        content.put_str(task_id, dump_config_string(self.__task_profile), os.path.join('profile', 'origin'))

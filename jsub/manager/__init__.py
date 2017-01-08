@@ -1,5 +1,4 @@
 import os
-import yaml
 
 from jsub.config import load_config_file
 

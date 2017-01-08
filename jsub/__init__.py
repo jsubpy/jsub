@@ -8,6 +8,13 @@ class Jsub(object):
         self.__operation = None
         self.__root_dir = os.path.dirname(os.path.realpath(__file__))
 
+
+    def version(self):
+        with open(os.path.join(self.__root_dir, 'VERSION'), 'r') as f:
+            ver = f.read()
+        return ver.strip()
+
+
     def __load_operation(self):
         if self.__operation is None:
             self.__operation = Operation(self.__jsubrc, self.__root_dir)

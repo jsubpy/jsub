@@ -58,3 +58,9 @@ def load_config_file(fn, fmt=''):
         return load_config_string(file_content, config_format)
     except UnknownConfigFormatError:
         raise UnknownConfigFormatError('Do not know the config file format: %s' % fn)
+
+def dump_config_string(config, fmt):
+    config_type = fmt + '_config'
+    config_class = snake_to_camel(config_type)
+    config_handler = load_class('jsub.config.'+config_type, config_class)()
+    return config_handler.dump_str(s)
