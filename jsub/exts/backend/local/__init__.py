@@ -40,19 +40,38 @@ class Local(Common):
         self._param = param
         self.initialize_common_param()
         self._foreground = param.get('foreground', False)
+        self._max_submit = param.get('max_submit', 4)
 
     def property(self):
         return {}
 
     def submit(self, task_id, sub_ids):
-        result = {}
+        processes = {}
+
+        count = 0
         for sub_id in sub_ids:
+            if count >= self._max_submit:
+                break
+
             try:
-                job_id = self.__submit_job(task_id, sub_id)
-                result[sub_id] = job_id
+                process = self.__submit_job(task_id, sub_id)
+                start_time = _process_start_time(process.pid)
             except OSError as e:
                 # warning('Submit job (%s.%s) to local failed: %s' % (task_id, sub_id, e))
-                pass
+                continue
+
+            count += 1
+            processes[sub_id] = {}
+            processes[sub_id]['process'] = process
+            processes[sub_id]['start_time'] = start_time
+
+        if self._foreground:
+            for sub_id, data in processes.items():
+                data['process'].wait()
+
+        result = {}
+        for sub_id, data in processes.items():
+            result[sub_id] = '%s_%s' % (data['start_time'], data['process'].pid)
         return result
 
     def __submit_job(self, task_id, sub_id):
@@ -62,7 +81,5 @@ class Local(Common):
         ferr = open(os.path.join(sub_log_dir, 'launcher.err'), 'w')
 
         launcher = self.launcher_work_path(task_id)
-        p = subprocess.Popen([launcher, str(sub_id)], stdout=fout, stderr=ferr)
 
-        job_id = '%s_%s' % (_process_start_time(p.pid), p.pid)
-        return job_id
+        return subprocess.Popen([launcher, str(sub_id)], stdout=fout, stderr=ferr)

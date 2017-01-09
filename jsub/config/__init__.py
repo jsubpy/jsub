@@ -21,10 +21,13 @@ def _file_ext(fn):
         return file_ext[1:]
     return file_ext
 
-def _load_config(s, fmt):
+def _config_handler(fmt):
     config_type = fmt + '_config'
     config_class = snake_to_camel(config_type)
-    config_handler = load_class('jsub.config.'+config_type, config_class)()
+    return load_class('jsub.config.'+config_type, config_class)()
+
+def _load_config(s, fmt):
+    config_handler = _config_handler(fmt)
     return config_handler.load_str(s)
 
 def _guess_format(s):
@@ -60,7 +63,5 @@ def load_config_file(fn, fmt=''):
         raise UnknownConfigFormatError('Do not know the config file format: %s' % fn)
 
 def dump_config_string(config, fmt):
-    config_type = fmt + '_config'
-    config_class = snake_to_camel(config_type)
-    config_handler = load_class('jsub.config.'+config_type, config_class)()
-    return config_handler.dump_str(s)
+    config_handler = _config_handler(fmt)
+    return config_handler.dump_str(config)

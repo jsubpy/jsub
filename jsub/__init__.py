@@ -17,7 +17,7 @@ class Jsub(object):
 
     def __load_operation(self):
         if self.__operation is None:
-            self.__operation = Operation(self.__jsubrc, self.__root_dir)
+            self.__operation = Operation(self.__jsubrc)
         return self.__operation
 
 
@@ -35,7 +35,7 @@ class Jsub(object):
 
     def show(self, task_id):
         op = self.__load_operation()
-        return op.list(task_id)
+        return op.show(task_id)
 
     def resubmit(self, task_id):
         op = self.__load_operation()

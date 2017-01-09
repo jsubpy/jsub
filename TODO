@@ -16,6 +16,8 @@ Scenario format should not be fixed to py
 
 backend_data in manager.config should be completed
 
+logging
+
 
 Badge for Travis, Test Coverage, Code Climate
 

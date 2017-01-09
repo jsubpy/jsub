@@ -16,10 +16,8 @@ from jsub.manager.navigator import NavigatorManager
 from jsub.manager.action    import ActionManager
 
 class Manager(object):
-    def __init__(self, jsubrc, root_dir):
+    def __init__(self, jsubrc):
         self.__default_config = load_config_file(os.path.expanduser(jsubrc))
-
-        self.__root_dir = root_dir
 
         self.__config_mgr = None
         self.__ext_mgr    = None

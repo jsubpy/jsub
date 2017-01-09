@@ -32,7 +32,7 @@ setup(
     ],
     entry_points = {
         'console_scripts': [
-            'jsub = jsub.run:main',
+            'jsub = jsub.command:main',
         ],
     },
     cmdclass = {'test': PyTest},

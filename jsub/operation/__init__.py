@@ -6,8 +6,8 @@ from jsub.operation.create import Create
 from jsub.operation.submit import Submit
 
 class Operation(object):
-    def __init__(self, jsubrc, root_dir):
-        self.__manager = Manager(jsubrc, root_dir)
+    def __init__(self, jsubrc):
+        self.__manager = Manager(jsubrc)
 
 
     def create(self, task_profile):
