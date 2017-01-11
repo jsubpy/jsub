@@ -2,6 +2,8 @@
 
 import click
 
+from jsub import version as jsub_version
+
 from jsub.command.create  import Create
 from jsub.command.submit  import Submit
 from jsub.command.run     import Run
@@ -17,7 +19,7 @@ def cli(ctx, jsubrc):
 
 @cli.command()
 def version():
-    click.echo('JSUB (Job Submission Utility Bundle) version %s' % Jsub().version())
+    click.echo('JSUB (Job Submission Utility Bundle) version %s' % jsub_version())
 
 
 @cli.command()

@@ -1,3 +1,5 @@
+from jsub.config        import load_config_file
+
 from jsub.manager.error import BackendNotSetupError
 
 class ConfigManager(object):
@@ -7,13 +9,13 @@ class ConfigManager(object):
         'max_cycle': 10000,
     }
 
-    def __init__(self, config):
-        self.__config = config
+    def __init__(self, jsubrc):
+        self.__config = load_config_file(jsubrc)
 
     def extensions(self):
         return ['jsub.exts']
 
-    def settings(self, item):
+    def setting(self, item):
         if item in self.__config:
             return self.__config[item]
         if item in default_settings:

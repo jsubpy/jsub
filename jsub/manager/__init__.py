@@ -1,8 +1,8 @@
 import os
 
-from jsub.config import load_config_file
+from jsub.log               import add_stream_logger
 
-from jsub.task import TaskPool
+from jsub.task              import TaskPool
 
 from jsub.manager.config    import ConfigManager
 from jsub.manager.extension import ExtensionManager
@@ -16,20 +16,27 @@ from jsub.manager.navigator import NavigatorManager
 from jsub.manager.action    import ActionManager
 
 class Manager(object):
-    def __init__(self, jsubrc):
-        self.__default_config = load_config_file(os.path.expanduser(jsubrc))
+    def __init__(self, jsubrc, root_dir):
+        self.__jsubrc     = os.path.expanduser(jsubrc)
+        self.__root_dir   = root_dir
 
         self.__config_mgr = None
         self.__ext_mgr    = None
 
         self.__repo       = None
         self.__content    = None
+
         self.__task_pool  = None
+
+
+    def init_logging(self):
+        level = self.load_config_manager().setting('log_level')
+        add_stream_logger(level)
 
 
     def load_config_manager(self):
         if self.__config_mgr is None:
-            self.__config_mgr = ConfigManager(self.__default_config)
+            self.__config_mgr = ConfigManager(self.__jsubrc)
         return self.__config_mgr
 
     def load_ext_manager(self):
@@ -50,9 +57,6 @@ class Manager(object):
 
     def load_bootstrap_manager(self):
         return BootstrapManager(self.load_ext_manager())
-
-    def load_navigator_manager(self):
-        return NavigatorManager(self.load_ext_manager())
 
     def load_scenario_manager(self):
         return ScenarioManager()

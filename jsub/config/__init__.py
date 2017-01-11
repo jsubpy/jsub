@@ -1,5 +1,4 @@
 import os
-import importlib
 
 from jsub.error import JsubError
 

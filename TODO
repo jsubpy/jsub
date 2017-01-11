@@ -16,7 +16,9 @@ Scenario format should not be fixed to py
 
 backend_data in manager.config should be completed
 
-logging
+ConfigManager should deal with multiple config files from extensions
+
+logging color
 
 
 Badge for Travis, Test Coverage, Code Climate

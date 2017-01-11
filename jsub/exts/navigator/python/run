@@ -32,35 +32,8 @@ import logging
 jsub_logger = logging.getLogger('JSUB')
 jsub_logger.setLevel(logging.DEBUG)
 
-class JsubFormatter(logging.Formatter):
-    # Add this method in order to display time zone offset correctly under python 2.x
-    def formatTime(self, record, datefmt=None):
-        ct = time.localtime(record.created)
-        if datefmt:
-            s = time.strftime(datefmt, ct)
-        else:
-            t = time.strftime('%Y-%m-%d %H:%M:%S', ct)
-
-            ms = '%03d' % record.msecs
-
-            if time.daylight == 0:
-                tz = time.tzname[0]
-                tz_sec = time.timezone
-            else:
-                tz = time.tzname[1]
-                tz_sec = time.altzone
-
-            if tz_sec > 0:
-                tz_sign = '-'
-            else:
-                tz_sign = '+'
-            tz_offset = '%02d%02d' % (abs(tz_sec)//3600, abs(tz_sec//60)%60)
-
-            s = '%s.%03d %s%s %s' % (t, record.msecs, tz_sign, tz_offset, tz)
-        return s
-
-FORMATTER = JsubFormatter('[%(asctime)s][%(name)s|%(levelname)s]: %(message)s')
-#FORMATTER = logging.Formatter('[%(asctime)s](%(name)s:%(levelname)s) %(message)s', '%Y-%m-%d %H:%M:%S')
+FORMATTER = logging.Formatter('[%(asctime)s][%(name)s|%(levelname)s]: %(message)s', '%Y-%m-%d %H:%M:%S UTC')
+logging.Formatter.converter = time.gmtime
 
 def add_stream_logger():
     logger = logging.getLogger('JSUB')

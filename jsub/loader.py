@@ -4,9 +4,6 @@ import inspect
 
 from jsub.error import JsubError
 
-from jsub.util import camel_to_snake
-from jsub.util import snake_to_camel
-
 
 class LoadError(JsubError):
     pass

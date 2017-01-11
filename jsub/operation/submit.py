@@ -1,8 +1,7 @@
 import os
-import shutil
+import logging
 
 from jsub.util import safe_mkdir
-from jsub.util import safe_copy
 
 class Submit(object):
     def __init__(self, manager, task, sub_ids=None, dry_run=False):
@@ -10,6 +9,8 @@ class Submit(object):
         self.__task    = self.__manager.load_task(task)
         self.__sub_ids = sub_ids
         self.__dry_run = dry_run
+
+        self.__logger  = logging.getLogger('JSUB')
 
         if self.__sub_ids is None:
             self.__sub_ids = list(range(len(self.__task.data['jobvar'])))
@@ -84,4 +85,5 @@ class Submit(object):
         if self.__dry_run:
             return
         result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['task_id'], self.__sub_ids)
-        print(result)
+
+        self.__logger.debug(result)

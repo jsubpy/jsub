@@ -1,13 +1,9 @@
-import os
-
-from jsub.manager import Manager
-
 from jsub.operation.create import Create
 from jsub.operation.submit import Submit
 
 class Operation(object):
-    def __init__(self, jsubrc):
-        self.__manager = Manager(jsubrc)
+    def __init__(self, manager):
+        self.__manager = manager
 
 
     def create(self, task_profile):

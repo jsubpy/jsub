@@ -32,12 +32,6 @@ logging '=======================================================================
 logging "Current directory: ${main_root}"
 
 
-# Check python version
-python_version_major=`python -c "import sys;print(sys.version_info[0])"`
-python_version_minor=`python -c "import sys;print(sys.version_info[1])"`
-logging "Python version: ${python_version_major}.${python_version_minor}"
-
-
 logging "Search for valid navigator..."
 for navigator_dir in ${navigator_root}/*
 do
