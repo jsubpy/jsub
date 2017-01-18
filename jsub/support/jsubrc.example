@@ -1,0 +1,53 @@
+log_level: DEBUG
+extensions: []
+max_jobs: 100000
+
+backend: dirac
+work_dir: ~/jsub/work
+
+repo:
+  type: file_system
+  param:
+    dir: ~/jsub/repo
+    format: compact
+
+content:
+  type: file_system
+  param:
+    dir: ~/jsub/content
+
+backends:
+  local:
+    type: local
+    param:
+      launcher: arg
+      work_dir: ~/jsub/work
+  fg:
+    type: local
+    param:
+      launcher: arg
+      work_dir: ~/jsub/work
+      foreground: True
+  condor:
+    type: condor
+    param:
+      work_dir: ~/jsub/work
+  dirac:
+    type: dirac
+    param:
+      site:
+        - CLOUD.IHEP.cn
+        - GRID.JINR.ru
+        - CLUSTER.USTC.cn
+
+bootstrap: shell
+
+navigator:
+  - xixi
+  - python
+  - hehe
+
+aux:
+  after_split: []
+  before_submit: []
+  after_submit: [dirac_task]

@@ -8,17 +8,25 @@ Monitoring event should receive SIGTERM in order to exit gracefully
 
 Rename sysvar -> system_var, actvar -> action_var, depvar -> dependency_var
 
+Write custom generator splitter
+
+Write export of task
+
 Config should raise SyntaxError with filename, lineno, offset, text
 
-Deal with navigator config in NavigatorManager, executable and format
+Action stdout and stderr, create file in Popen
 
-Scenario format should not be fixed to py
+Action and navigator should copy extra files, accept patterns like 'dir/**/*'
+Accept both single file and re pattern
 
 backend_data in manager.config should be completed
 
 ConfigManager should deal with multiple config files from extensions
 
 logging color
+
+Test on ubuntu to check the shell scripts about space in dir name, especially running on sh
+
 
 
 Badge for Travis, Test Coverage, Code Climate

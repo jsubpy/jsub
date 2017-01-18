@@ -5,20 +5,20 @@ logging() {
 }
 
 
-cd `dirname $0`
-main_root=`pwd`
+cd $(dirname "$0")/..
+main_root=$(pwd)
 
-task_sub_id=$1
-work_root=$2
+task_sub_id="$1"
+job_root="$2"
 
 navigator_root="${main_root}/navigator"
 scenario_root="${main_root}/scenario"
 action_root="${main_root}/action"
 input_root="${main_root}/input"
 
-log_root="${work_root}/log"
-run_root="${work_root}/run"
-output_root="${work_root}/output"
+log_root="${job_root}/log"
+run_root="${job_root}/run"
+output_root="${job_root}/output"
 
 mkdir -p "$log_root"
 mkdir -p "$run_root"
@@ -33,11 +33,12 @@ logging "Current directory: ${main_root}"
 
 
 logging "Search for valid navigator..."
-for navigator_dir in ${navigator_root}/*
+for navigator_dir in "${navigator_root}"/*
 do
-    navigator_ok=`${navigator_dir}/run --validate 2>/dev/null`
+    navigator_exe=$(cat "${navigator_dir}/executable")
+    navigator_ok=$(${navigator_dir}/${navigator_exe} --validate 2>/dev/null)
     if [ $? = 0 -a "$navigator_ok" = 'JSUB navigator OK' ]; then
-        navigator=$navigator_dir
+        navigator="$navigator_dir"
         break
     fi
 done
@@ -49,7 +50,7 @@ fi
 
 logging "Running the navigator: `basename ${navigator}`..."
 
-"${navigator}/run" "--task_sub_id=${task_sub_id}" \
+"${navigator}/${navigator_exe}" "--task_sub_id=${task_sub_id}" \
     "--main_root=${main_root}" "--scenario_root=${scenario_root}" "--log_root=${log_root}" "--action_root=${action_root}" \
     "--run_root=${run_root}" "--input_root=${input_root}" "--output_root=${output_root}"
 exit_code=$?

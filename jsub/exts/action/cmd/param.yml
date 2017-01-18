@@ -1,0 +1,8 @@
+executable: cmd.sh
+stdout: std.out
+stderr: std.err
+cpu_core: 0
+ignore_error: True
+pass_var:
+  sysvar: JSUB_+env
+  actvar: JSUB_+env

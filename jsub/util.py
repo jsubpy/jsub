@@ -10,6 +10,10 @@ def snake_to_camel(name):
     return name.title().replace('_', '')
 
 
+def safe_rmdir(directory):
+    if os.path.isdir(directory):
+        shutil.rmtree(directory)
+
 def safe_mkdir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)

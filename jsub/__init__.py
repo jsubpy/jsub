@@ -39,6 +39,10 @@ class Jsub(object):
         op = self.__load_operation()
         return op.submit(task, sub_ids, dry_run)
 
+    def rename(self, task_id, new_task_name):
+        op = self.__load_operation()
+        return op.rename(task_id, new_task_name)
+
     def list(self, task_id=None):
         op = self.__load_operation()
         return op.list(task_id)

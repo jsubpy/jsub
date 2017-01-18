@@ -23,10 +23,10 @@ def version():
 
 
 @cli.command()
-@click.argument('task_profile_file')
+@click.argument('task_profile')
 @click.pass_context
-def create(ctx, task_profile_file):
-    cmd = Create(jsubrc=ctx.obj['jsubrc'], task_profile_file=task_profile_file)
+def create(ctx, task_profile):
+    cmd = Create(jsubrc=ctx.obj['jsubrc'], task_profile_file=task_profile)
     cmd.execute()
 
 
@@ -41,10 +41,10 @@ def submit(ctx, dry_run, task_id):
 
 @cli.command()
 @click.option('--dry-run', is_flag=True, help='Create necessary files without final submission')
-@click.argument('task_profile_file')
+@click.argument('task_profile')
 @click.pass_context
-def run(ctx, dry_run, task_profile_file):
-    cmd = Run(jsubrc=ctx.obj['jsubrc'], task_profile_file=task_profile_file, dry_run=dry_run)
+def run(ctx, dry_run, task_profile):
+    cmd = Run(jsubrc=ctx.obj['jsubrc'], task_profile_file=task_profile, dry_run=dry_run)
     cmd.execute()
 
 

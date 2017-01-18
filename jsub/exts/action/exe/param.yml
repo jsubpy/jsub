@@ -1,0 +1,10 @@
+executable: exe.sh
+stdout: std.out
+stderr: std.err
+cpu_core: 0
+ignore_error: True
+pass_var:
+  sysvar: JSUB_+env
+  jobvar: arg
+  actvar: JSUB_+env
+  depvar: pipe

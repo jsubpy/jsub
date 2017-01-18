@@ -2,21 +2,18 @@ import os
 
 from jsub.util import safe_copy
 
-from jsub.config import load_config_file
-
 class BootstrapManager(object):
     def __init__(self, ext_mgr):
         self.__ext_mgr = ext_mgr
 
-    def __bootstrap_config(self, bootstrap_dir):
-        bootstrap_config_file = os.path.join(bootstrap_dir, 'config.yml')
-        return load_config_file(bootstrap_config_file)
-
-    def create_bootstrap(self, bootstrap, dst_dir):
-        bootstrap_dir = self.__ext_mgr.ext_dir('bootstrap', bootstrap)
-        bootstrap_config = self.__bootstrap_config(bootstrap_dir)
-        executable = bootstrap_config.get('executable', 'run')
+    def create_bootstrap(self, bootstrap_type, dst_dir):
+        bootstrap_dir = self.__ext_mgr.ext_dir('bootstrap', bootstrap_type)
+        bootstrap_param = self.__ext_mgr.ext_config('bootstrap', bootstrap_type, 'param')
+        executable = bootstrap_param.get('executable', 'run')
 
         src_exe = os.path.join(bootstrap_dir, executable)
-        dst_exe = os.path.join(dst_dir, 'bootstrap')
+        dst_exe = os.path.join(dst_dir, executable)
         safe_copy(src_exe, dst_exe)
+
+        with open(os.path.join(dst_dir, 'executable'), 'w') as f:
+            f.write(executable)

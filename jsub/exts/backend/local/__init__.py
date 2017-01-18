@@ -1,14 +1,10 @@
 run_on = 'local'
 run_on = 'remote'
 
-run_on_background = True
-
-# could be used for tests
-run_on_foregroud = True
-
 import os
 import time
 import subprocess
+import logging
 
 CLOCK_TICKS = os.sysconf('SC_CLK_TCK')
 
@@ -38,6 +34,9 @@ def _process_start_time(pid):
 class Local(Common):
     def __init__(self, param):
         self._param = param
+
+        self._logger = logging.getLogger('JSUB')
+
         self.initialize_common_param()
         self._foreground = param.get('foreground', False)
         self._max_submit = param.get('max_submit', 4)
@@ -45,7 +44,7 @@ class Local(Common):
     def property(self):
         return {}
 
-    def submit(self, task_id, sub_ids):
+    def submit(self, task_id, sub_ids, launcher_exe):
         processes = {}
 
         count = 0
@@ -54,10 +53,12 @@ class Local(Common):
                 break
 
             try:
-                process = self.__submit_job(task_id, sub_id)
+                launcher = os.path.join(self.work_root(task_id), launcher_exe)
+                FNULL = open(os.devnull, 'w')
+                process = subprocess.Popen([launcher, str(sub_id)], stdout=FNULL, stderr=subprocess.STDOUT)
                 start_time = _process_start_time(process.pid)
             except OSError as e:
-                # warning('Submit job (%s.%s) to local failed: %s' % (task_id, sub_id, e))
+                self._logger.error('Submit job (%s.%s) to "local" failed: %s' % (task_id, sub_id, e))
                 continue
 
             count += 1
@@ -73,13 +74,3 @@ class Local(Common):
         for sub_id, data in processes.items():
             result[sub_id] = '%s_%s' % (data['start_time'], data['process'].pid)
         return result
-
-    def __submit_job(self, task_id, sub_id):
-        sub_log_dir = os.path.join(self.launcher_log_dir(task_id), str(sub_id))
-        safe_mkdir(sub_log_dir)
-        fout = open(os.path.join(sub_log_dir, 'launcher.out'), 'w')
-        ferr = open(os.path.join(sub_log_dir, 'launcher.err'), 'w')
-
-        launcher = self.launcher_work_path(task_id)
-
-        return subprocess.Popen([launcher, str(sub_id)], stdout=fout, stderr=ferr)

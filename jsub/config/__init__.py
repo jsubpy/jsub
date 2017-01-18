@@ -1,4 +1,5 @@
 import os
+import logging
 
 from jsub.error import JsubError
 
@@ -9,8 +10,13 @@ from jsub.util import snake_to_camel
 
 _GUESS_CONFIG_FORMAT = ('yaml', 'json', 'toml', 'py')
 
+_jsub_logger = logging.getLogger('JSUB')
+
 
 class UnknownConfigFormatError(JsubError):
+    pass
+
+class ConfigFileNotFoundError(JsubError):
     pass
 
 
@@ -29,23 +35,20 @@ def _load_config(s, fmt):
     config_handler = _config_handler(fmt)
     return config_handler.load_str(s)
 
-def _guess_format(s):
+def _load_config_guess(s):
     for fmt in _GUESS_CONFIG_FORMAT:
         try:
-            _load_config(s, fmt)
-            return fmt
-        except:
+            return _load_config(s, fmt)
+        except Exception:
+            _jsub_logger.debug('Skip config format : %s' % fmt)
             continue
     raise UnknownConfigFormatError('Do not know the config string format')
 
 
 def load_config_string(s, fmt=''):
     if fmt:
-        config_format = fmt
-    else:
-        config_format = _guess_format(s)
-
-    return _load_config(s, config_format)
+        return _load_config(s, fmt)
+    return _load_config_guess(s)
 
 def load_config_file(fn, fmt=''):
     with open(fn, 'r') as f:
@@ -61,6 +64,22 @@ def load_config_file(fn, fmt=''):
     except UnknownConfigFormatError:
         raise UnknownConfigFormatError('Do not know the config file format: %s' % fn)
 
+def find_and_load_config_file(directory, name):
+    for fn in os.listdir(directory):
+        full_path = os.path.join(directory, fn)
+        if fn.startswith(name) and os.path.isfile(full_path):
+            try:
+                return load_config_file(full_path)
+            except Exception as e:
+                _jsub_logger.debug('Skip unknown config file "%s": %s' % (full_path, e))
+                continue
+
+    raise ConfigFileNotFoundError('Could not find config "%s" from directory "%s"' % (name, directory))
+
 def dump_config_string(config, fmt):
     config_handler = _config_handler(fmt)
     return config_handler.dump_str(config)
+
+def dump_config_file(config, fn, fmt):
+    config_handler = _config_handler(fmt)
+    return config_handler.dump_file(config, fn)

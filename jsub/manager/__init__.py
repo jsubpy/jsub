@@ -14,6 +14,7 @@ from jsub.manager.bootstrap import BootstrapManager
 from jsub.manager.scenario  import ScenarioManager
 from jsub.manager.navigator import NavigatorManager
 from jsub.manager.action    import ActionManager
+from jsub.manager.launcher  import LauncherManager
 
 class Manager(object):
     def __init__(self, jsubrc, root_dir):
@@ -67,6 +68,9 @@ class Manager(object):
     def load_action_manager(self):
         return ActionManager(self.load_ext_manager())
 
+    def load_launcher_manager(self):
+        return LauncherManager(self.load_ext_manager())
+
 
     def load_repo(self):
         if self.__repo is None:
@@ -79,6 +83,7 @@ class Manager(object):
             config_content = self.load_config_manager().content()
             self.__content = self.load_ext_manager().load_ext_common('content', config_content)
         return self.__content
+
 
     def load_task_pool(self):
         if self.__task_pool is None:

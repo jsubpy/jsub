@@ -1,4 +1,4 @@
-import toml
+import pytoml as toml
 
 class TomlConfig(object):
     def __init__(self, param={}):
@@ -13,7 +13,7 @@ class TomlConfig(object):
 
     def dump_file(self, data, fn):
         with open(fn, 'w') as f:
-            toml.dump(data, f)
+            toml.dump(f, data)
 
     def dump_str(self, data):
         return toml.dumps(data)

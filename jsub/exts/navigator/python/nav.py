@@ -279,10 +279,8 @@ class UnitRunner:
         self.__unit_threads = {}
         self.__queue_unit = Queue()
 
-    def __prepare_args_basic(self, unit, action):
+    def __args_basic(self, unit, action_type, executable):
         args = []
-        action_type = action.get('type', unit)
-        executable = action.get('executable', action_type)
         args.append(os.path.join(self.__scenario_general['action_root'], action_type, executable))
         return args
 
@@ -324,7 +322,7 @@ class UnitRunner:
 
     def __generate_var(self, pass_method, data):
         var = {}
-        pass_var = data['action']['pass_var']
+        pass_var = data['param']['pass_var']
         for var_type, methods in pass_var.items():
             for method in methods:
                 method_fragments = self.__find_pass_method(pass_method, method)
@@ -344,7 +342,7 @@ class UnitRunner:
         jsub_logger.debug(' - Passed by pipe: %s', var_pipe)
 
         # generate args for UnitThread
-        args_basic = self.__prepare_args_basic(unit, data['action'])
+        args_basic = self.__args_basic(unit, data['type'], data['param']['executable'])
         args_var   = self.__var_2_arg(var_arg)
         args = args_basic + args_var
 
@@ -405,7 +403,7 @@ class UnitRunner:
         return unit_info
 
     def finished_units(self):
-        finished_units = {}
+        units = {}
         if self.__unit_threads:
             unit_info = self.__finished_unit()
             unit = unit_info['unit']
@@ -413,8 +411,8 @@ class UnitRunner:
             self.__unit_threads[unit].join()
             del self.__unit_threads[unit]
 
-            finished_units[unit] = unit_info
-        return finished_units
+            units[unit] = unit_info
+        return units
 
 
     def kill_all_units(self):
@@ -459,7 +457,7 @@ class Application:
     def __init__(self, scenario):
         self.__scenario_general  = scenario['general']
 
-        task_sub_id = int(self.__scenario_general['task_sub_id'])
+        task_sub_id = self.__scenario_general['task_sub_id']
         all_jobvar = scenario['jobvar']
         if task_sub_id not in all_jobvar:
             raise TaskSubIdNotFoundError('Task sub ID not found: %s', task_sub_id)
@@ -475,7 +473,8 @@ class Application:
             self.__data_workflow[unit]['jobvar'] = self.__scenario_jobvar
             self.__data_workflow[unit]['actvar'] = self.__scenario_workflow[unit]['actvar']
             self.__data_workflow[unit]['depvar'] = {}
-            self.__data_workflow[unit]['action'] = self.__scenario_workflow[unit]['action']
+            self.__data_workflow[unit]['type'] = self.__scenario_workflow[unit]['type']
+            self.__data_workflow[unit]['param'] = self.__scenario_workflow[unit]['param']
 
         self.__unit_runner = UnitRunner(self.__scenario_general)
 
@@ -523,7 +522,7 @@ class Application:
                 vertice_zero_indegree.remove(unit)
 
                 for to_unit in self.__dag_workflow.successors(unit):
-                    self.__data_workflow[to_unit]['depvar'].update(self.__data_workflow[unit]['depvar'])
+#                    self.__data_workflow[to_unit]['depvar'].update(self.__data_workflow[unit]['depvar'])
                     if 'depvar' in info['outvar']:
                         self.__data_workflow[to_unit]['depvar'].update(info['outvar']['depvar'])
 

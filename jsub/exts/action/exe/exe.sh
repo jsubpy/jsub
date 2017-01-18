@@ -1,20 +1,20 @@
 #!/bin/sh
 
-current_dir=`pwd`
+current_dir=$(pwd)
 
 if [ -n "$JSUB_log_dir" ]; then
-    logdir=$JSUB_log_dir
+    logdir="$JSUB_log_dir"
 else
-    logdir=$current_dir
+    logdir="$current_dir"
 fi
 
 out="$logdir/exe.out"
 err="$logdir/exe.err"
 
 if [ "$JSUB_location" == 'common' ]; then
-    exe_path=${JSUB_input_common_dir}/${JSUB_exe}
+    exe_path="${JSUB_input_common_dir}/${JSUB_exe}"
 else
-    exe_path=${JSUB_input_dir}/${JSUB_exe}
+    exe_path="${JSUB_input_dir}/${JSUB_exe}"
 fi
 
 # pass accepted arguments to the exe
