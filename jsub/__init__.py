@@ -43,9 +43,9 @@ class Jsub(object):
         op = self.__load_operation()
         return op.rename(task_id, new_task_name)
 
-    def list(self, task_id=None):
+    def ls(self, task_id=None):
         op = self.__load_operation()
-        return op.list(task_id)
+        return op.ls(task_id)
 
     def show(self, task_id):
         op = self.__load_operation()

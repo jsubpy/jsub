@@ -26,7 +26,6 @@ mkdir -p "$output_root"
 
 
 log_file="${log_root}/bootstrap.log"
-err_file="${log_root}/bootstrap.err"
 
 logging '================================================================================'
 logging "Current directory: ${main_root}"
@@ -36,7 +35,7 @@ logging "Search for valid navigator..."
 for navigator_dir in "${navigator_root}"/*
 do
     navigator_exe=$(cat "${navigator_dir}/executable")
-    navigator_ok=$(${navigator_dir}/${navigator_exe} --validate 2>/dev/null)
+    navigator_ok=$(${navigator_dir}/${navigator_exe} --validate 2>>$log_file)
     if [ $? = 0 -a "$navigator_ok" = 'JSUB navigator OK' ]; then
         navigator="$navigator_dir"
         break

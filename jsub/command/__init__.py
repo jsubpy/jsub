@@ -1,13 +1,12 @@
-#!/usr/bin/env python
-
 import click
 
 from jsub import version as jsub_version
 
-from jsub.command.create  import Create
-from jsub.command.submit  import Submit
-from jsub.command.run     import Run
-from jsub.command.show    import Show
+from jsub.command.create import Create
+from jsub.command.submit import Submit
+from jsub.command.run    import Run
+from jsub.command.ls     import Ls
+from jsub.command.show   import Show
 
 
 @click.group()
@@ -23,10 +22,11 @@ def version():
 
 
 @cli.command()
-@click.argument('task_profile')
+@click.argument('task_profile', type=click.Path(exists=True))
 @click.pass_context
 def create(ctx, task_profile):
-    cmd = Create(jsubrc=ctx.obj['jsubrc'], task_profile_file=task_profile)
+    task_profile_file = click.format_filename(task_profile)
+    cmd = Create(jsubrc=ctx.obj['jsubrc'], task_profile_file=task_profile_file)
     cmd.execute()
 
 
@@ -41,10 +41,11 @@ def submit(ctx, dry_run, task_id):
 
 @cli.command()
 @click.option('--dry-run', is_flag=True, help='Create necessary files without final submission')
-@click.argument('task_profile')
+@click.argument('task_profile', type=click.Path(exists=True))
 @click.pass_context
 def run(ctx, dry_run, task_profile):
-    cmd = Run(jsubrc=ctx.obj['jsubrc'], task_profile_file=task_profile, dry_run=dry_run)
+    task_profile_file = click.format_filename(task_profile)
+    cmd = Run(jsubrc=ctx.obj['jsubrc'], task_profile_file=task_profile_file, dry_run=dry_run)
     cmd.execute()
 
 
@@ -53,6 +54,14 @@ def run(ctx, dry_run, task_profile):
 @click.pass_context
 def show(ctx, task_id):
     cmd = Show(jsubrc=ctx.obj['jsubrc'], task_id=task_id)
+    cmd.execute()
+
+
+@cli.command()
+@click.argument('task_ids', type=int, nargs=-1)
+@click.pass_context
+def ls(ctx, task_ids):
+    cmd = Ls(jsubrc=ctx.obj['jsubrc'], task_ids=list(task_ids))
     cmd.execute()
 
 

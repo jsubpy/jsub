@@ -13,6 +13,7 @@ Write custom generator splitter
 Write export of task
 
 Config should raise SyntaxError with filename, lineno, offset, text
+If not able to get these info, set to "unknown"
 
 Action stdout and stderr, create file in Popen
 
@@ -21,16 +22,18 @@ Accept both single file and re pattern
 
 backend_data in manager.config should be completed
 
+Use a navigator list file instead of 00-xx, 01-xxx, 02-yyy
+
 ConfigManager should deal with multiple config files from extensions
 
 logging color
 
 Test on ubuntu to check the shell scripts about space in dir name, especially running on sh
 
+Configure TZ in jsubrc
+
 
 
 Badge for Travis, Test Coverage, Code Climate
 
 Write full tests
-
-Write documentation on jsubpy.github.io (http://idratherbewriting.com/documentation-theme-jekyll/)

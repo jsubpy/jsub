@@ -1,5 +1,8 @@
 log_level: DEBUG
+time_zone: utc
+
 extensions: []
+
 max_jobs: 100000
 
 backend: dirac

@@ -18,9 +18,9 @@ class NavigatorManager(object):
         return formats
 
     def create_navigators(self, navigators, dst_dir):
-        digit_number = len(str(len(navigators)))
+        digit_number = len(str(len(navigators) - 1))
         navigator_format = '%%0%dd-%%s' % max(digit_number, 2)
-        navigator_index = 1
+        navigator_index = 0
         for navigator_type in navigators:
             nav_dir = self.__ext_mgr.ext_dir('navigator', navigator_type)
             nav_param = self.__nav_param(navigator_type)

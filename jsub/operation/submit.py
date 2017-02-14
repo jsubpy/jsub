@@ -11,7 +11,7 @@ class Submit(object):
         self.__sub_ids = sub_ids
         self.__dry_run = dry_run
 
-        self.__logger  = logging.getLogger('JSUB')
+        self.__logger = logging.getLogger('JSUB')
 
         if self.__sub_ids is None:
             self.__sub_ids = list(range(len(self.__task.data['jobvar'])))
