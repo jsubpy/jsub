@@ -1,0 +1,6 @@
+include jsub/support/jsubrc.example
+recursive-include jsub/exts/action *
+recursive-include jsub/exts/bootstrap *
+recursive-include jsub/exts/launcher *
+recursive-include jsub/exts/navigator *
+recursive-include jsub/exts *.yml
