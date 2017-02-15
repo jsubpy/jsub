@@ -19,8 +19,8 @@ class PyTest(TestCommand):
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-version_file = open(os.path.join(here, 'jsub', 'VERSION'))
-version = version_file.read().strip()
+with open(os.path.join(here, 'jsub', 'VERSION')) as version_file:
+    version = version_file.read().strip()
 
 with open(os.path.join(here, 'README.rst')) as f:
     long_description = f.read()
