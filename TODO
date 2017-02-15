@@ -4,36 +4,7 @@ boss: output file name should be a temp one and then rename
 Stop unit with SIGINT first, then SIGTERM, then SIGKILL
 DO NOT do this, no need for SIGINT!!!
 
-Monitoring event should receive SIGTERM in order to exit gracefully
-
-Rename sysvar -> system_var, actvar -> action_var, depvar -> dependency_var
-
-Write custom generator splitter
-
-Write export of task
-
-Config should raise SyntaxError with filename, lineno, offset, text
-If not able to get these info, set to "unknown"
-
-Action stdout and stderr, create file in Popen
-
-Action and navigator should copy extra files, accept patterns like 'dir/**/*'
-Accept both single file and re pattern
-
-backend_data in manager.config should be completed
-
-Use a navigator list file instead of 00-xx, 01-xxx, 02-yyy
-
-ConfigManager should deal with multiple config files from extensions
-
 logging color
 
-Test on ubuntu to check the shell scripts about space in dir name, especially running on sh
-
-Configure TZ in jsubrc
-
-
-
-Badge for Travis, Test Coverage, Code Climate
-
-Write full tests
+Test on ubuntu to check the shell scripts about space in dir name,
+especially running on POSIX sh
