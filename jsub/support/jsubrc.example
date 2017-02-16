@@ -1,12 +1,9 @@
 log_level: DEBUG
 time_zone: utc
 
-extensions: []
+extension: jsub_cepc
 
 max_jobs: 100000
-
-backend: dirac
-work_dir: ~/jsub/work
 
 repo:
   type: file_system
@@ -19,36 +16,39 @@ content:
   param:
     dir: ~/jsub/content
 
-backends:
-  local:
-    type: local
-    param:
-      launcher: arg
-      work_dir: ~/jsub/work
-  fg:
-    type: local
-    param:
-      launcher: arg
-      work_dir: ~/jsub/work
-      foreground: True
-  condor:
-    type: condor
-    param:
-      work_dir: ~/jsub/work
-  dirac:
-    type: dirac
-    param:
-      site:
-        - CLOUD.IHEP.cn
-        - GRID.JINR.ru
-        - CLUSTER.USTC.cn
-
 bootstrap: shell
 
 navigator:
   - xixi
   - python
   - hehe
+
+backend:
+  default: dirac
+  work_dir: ~/jsub/work
+  predefined:
+    local:
+      type: local
+      param:
+        launcher: arg
+        work_dir: ~/jsub/work
+    fg:
+      type: local
+      param:
+        launcher: arg
+        work_dir: ~/jsub/work
+        foreground: True
+    condor:
+      type: condor
+      param:
+        work_dir: ~/jsub/work
+    dirac:
+      type: dirac
+      param:
+        site:
+          - CLOUD.IHEP.cn
+          - GRID.JINR.ru
+          - CLUSTER.USTC.cn
 
 aux:
   after_split: []

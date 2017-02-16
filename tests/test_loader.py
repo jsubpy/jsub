@@ -3,7 +3,7 @@ import pytest
 import os
 import sys
 
-from jsub.loader import Loader
+from jsub.loader import load_class
 from jsub.loader import ModuleNotFoundError, ClassNotFoundError, NotAClassError
 
 @pytest.fixture(scope='module', autouse=True)
@@ -13,45 +13,42 @@ def setup_python_path():
     load_path2 = os.path.join(current_path, 'test_loader', 'load2')
     sys.path.insert(0, load_path1)
     sys.path.insert(0, load_path2)
-
-@pytest.fixture(scope='module')
-def loader():
-    return Loader(['jsub_ext1', 'jsub_ext2', 'jsub_ext3'])
+    print(sys.path)
 
 
-def test_load_instances(loader):
-    i = loader.load_instance('repo', 'FileSystem')
+def test_load_instances():
+    i = load_class('jsub_ext1.repo.file_system', 'FileSystem')()
     assert i.desc == 'load1: jsub_ext1.repo.file_system.FileSystem'
-    i = loader.load_instance('repo', 'Sqlite')
+    i = load_class('jsub_ext3.repo.sqlite', 'Sqlite')()
     assert i.desc == 'load2: jsub_ext3.repo.sqlite.Sqlite'
-    i = loader.load_instance('backend', 'Condor')
+    i = load_class('jsub_ext2.backend.condor', 'Condor')()
     assert i.desc == 'load1: jsub_ext2.backend.condor.Condor'
-    i = loader.load_instance('backend', 'Pbs')
+    i = load_class('jsub_ext2.backend.pbs', 'Pbs')()
     assert i.desc == 'load1: jsub_ext2.backend.pbs.Pbs'
-    i = loader.load_instance('backend', 'Dirac')
+    i = load_class('jsub_ext3.backend.dirac', 'Dirac')()
     assert i.desc == 'load2: jsub_ext3.backend.dirac.Dirac'
 
-def test_load_specific_class(loader):
-    i = loader.load_instance('backend', 'ClassWithSpecificName', 'condor')
+def test_load_specific_class():
+    i = load_class('jsub_ext2.backend.condor', 'ClassWithSpecificName')()
     assert i.desc == 'load1: jsub_ext2.backend.condor.ClassWithSpecificName'
 
 
-def test_load_not_existed_module(loader):
+def test_load_not_existed_module():
     with pytest.raises(ModuleNotFoundError):
-        loader.load_instance('backend', 'UnknownClass')
+        load_class('jsub_ext2.backend.unknown_module', 'UnknownClass')
     with pytest.raises(ModuleNotFoundError):
-        loader.load_instance('backend', 'Condor', 'unknown_module')
+        load_class('jsub_ext3.backend.unknown_module', 'Condor')
 
-def test_load_not_existed_class(loader):
+def test_load_not_existed_class():
     with pytest.raises(ClassNotFoundError):
-        loader.load_instance('backend', 'UnknownClass', 'condor')
+        load_class('jsub_ext2.backend.condor', 'UnknownClass')
     with pytest.raises(ClassNotFoundError):
-        loader.load_instance('repo', 'Empty')
+        load_class('jsub_ext3.repo.empty', 'Empty')
     with pytest.raises(ClassNotFoundError):
-        loader.load_instance('backend', 'ClassWithAnotherName', 'condor')
+        load_class('jsub_ext2.backend.condor', 'ClassWithAnotherName')
 
-def test_load_not_a_class(loader):
+def test_load_not_a_class():
     with pytest.raises(NotAClassError):
-        loader.load_instance('backend', 'i_am_a_function', 'dirac')
+        load_class('jsub_ext3.backend.dirac', 'i_am_a_function')
     with pytest.raises(NotAClassError):
-        loader.load_instance('backend', 'i_am_a_variable', 'dirac')
+        load_class('jsub_ext3.backend.dirac', 'i_am_a_variable')

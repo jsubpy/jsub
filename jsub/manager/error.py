@@ -5,7 +5,6 @@ class ExtensionNotFoundError(JsubError):
     pass
 
 
-
 class ConfigNotSetupError(JsubError):
     pass
 

@@ -28,7 +28,7 @@ with open(os.path.join(here, 'README.rst')) as f:
 setup(
     name = 'jsub',
     version = version,
-    description = 'Job submission toolkit bundle',
+    description = 'Job submission utility bundle',
     long_description = long_description,
     url = 'https://jsubpy.github.io/',
     author = 'Xianghu Zhao',
@@ -50,6 +50,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 
     keywords = 'Job submission tools',

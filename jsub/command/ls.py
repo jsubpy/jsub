@@ -29,9 +29,9 @@ def _convert_table_data(tasks_data, columns):
                     line_data.append(task_data[col]['type'])
                 else:
                     line_data.append(str(task_data[col]))
-            elif col in ['created_at']:
-                created_time = datetime.datetime.strptime(task_data[col], '%Y-%m-%dT%H:%M:%S.%f')
-                time_str = datetime.datetime.strftime(created_time, '%Y-%m-%d %H:%M:%S')
+            elif col in ['created_at', 'updated_at']:
+                dst_time = datetime.datetime.strptime(task_data[col], '%Y-%m-%dT%H:%M:%S.%f')
+                time_str = datetime.datetime.strftime(dst_time, '%Y-%m-%d %H:%M:%S')
                 line_data.append(time_str)
             else:
                 line_data.append(str(task_data[col]))

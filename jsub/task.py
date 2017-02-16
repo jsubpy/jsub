@@ -5,6 +5,8 @@ from jsub.error import TaskIdFormatError
 class Task(object):
     def __init__(self, data={}):
         self.data = data
+
+    def create_now(self):
         if 'created_at' not in self.data:
             self.data['created_at'] = datetime.datetime.utcnow().isoformat()
 
@@ -22,6 +24,7 @@ class TaskPool(object):
 
     def create(self, task_data):
         task = Task(task_data)
+        task.create_now()
         self.save(task)
         return task
 

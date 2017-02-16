@@ -1,23 +1,17 @@
 import os
 import logging
 
-from jsub.error import JsubError
-
 from jsub.loader import load_class
 
 from jsub.util import snake_to_camel
+
+from jsub.config.error import UnknownConfigFormatError
+from jsub.config.error import ConfigFileNotFoundError
 
 
 _GUESS_CONFIG_FORMAT = ('yaml', 'json', 'toml', 'py')
 
 _jsub_logger = logging.getLogger('JSUB')
-
-
-class UnknownConfigFormatError(JsubError):
-    pass
-
-class ConfigFileNotFoundError(JsubError):
-    pass
 
 
 def _file_ext(fn):
@@ -29,7 +23,7 @@ def _file_ext(fn):
 def _config_handler(fmt):
     config_type = fmt + '_config'
     config_class = snake_to_camel(config_type)
-    return load_class('jsub.config.'+config_type, config_class)()
+    return load_class('jsub.config.handler.'+config_type, config_class)()
 
 def _load_config(s, fmt):
     config_handler = _config_handler(fmt)
@@ -67,7 +61,7 @@ def load_config_file(fn, fmt=''):
 def find_and_load_config_file(directory, name):
     for fn in os.listdir(directory):
         full_path = os.path.join(directory, fn)
-        if fn.startswith(name) and os.path.isfile(full_path):
+        if os.path.splitext(fn)[0] == name and os.path.isfile(full_path):
             try:
                 return load_config_file(full_path)
             except Exception as e:
