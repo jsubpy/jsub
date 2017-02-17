@@ -12,8 +12,15 @@ class ConfigManager(object):
     def __init__(self, jsubrc):
         self.__config = load_config_file(jsubrc)
 
-    def extensions(self):
-        return ['jsub.exts']
+    def packages_directly(self):
+        packages = []
+        if 'package' in self.__config:
+            package = self.__config['package']
+            if isinstance(package, list):
+                packages += package
+            else:
+                packages.append(package)
+        return packages + ['jsub.exts']
 
     def setting(self, item):
         if item in self.__config:

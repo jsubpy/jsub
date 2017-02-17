@@ -1,9 +1,10 @@
 log_level: DEBUG
 time_zone: utc
 
-extension: jsub_cepc
+package: jsub_cepc
 
-max_jobs: 100000
+max_jobs_per_task: 100000
+list_tasks_recent_days: 60
 
 repo:
   type: file_system

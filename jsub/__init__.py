@@ -21,8 +21,8 @@ class Jsub(object):
         self.__manager.init_logging()
 
 
-    def ls_ext(self):
-        return self.__manager.extensions()
+    def package(self):
+        return self.__manager.load_pkg_manager().packages()
 
 
     def __load_operation(self):
@@ -31,6 +31,10 @@ class Jsub(object):
         return self.__operation
 
 
+    def rename(self, task, new_name):
+        op = self.__load_operation()
+        return op.rename(task, new_name)
+
     def create(self, task_profile):
         op = self.__load_operation()
         return op.create(task_profile)
@@ -38,10 +42,6 @@ class Jsub(object):
     def submit(self, task, sub_ids=None, dry_run=False):
         op = self.__load_operation()
         return op.submit(task, sub_ids, dry_run)
-
-    def rename(self, task_id, new_task_name):
-        op = self.__load_operation()
-        return op.rename(task_id, new_task_name)
 
     def ls(self, task_id=None):
         op = self.__load_operation()

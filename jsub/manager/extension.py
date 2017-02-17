@@ -12,14 +12,14 @@ from jsub.util   import snake_to_camel
 
 
 class ExtensionManager(object):
-    def __init__(self, exts):
-        self.__exts = exts
+    def __init__(self, packages):
+        self.__packages = packages
 
         self.__logger = logging.getLogger('JSUB')
 
     def load_ext(self, category, ext_name, *args, **kwargs):
         class_name = snake_to_camel(ext_name)
-        for ext in self.__exts:
+        for ext in self.__packages:
             module_name = '.'.join([ext, category, ext_name])
             try:
                 c = load_class(module_name, class_name)
@@ -34,7 +34,7 @@ class ExtensionManager(object):
         return self.load_ext(category, load_data['type'], load_data.get('param', {}))
 
     def ext_dir(self, category, ext_name):
-        for ext in self.__exts:
+        for ext in self.__packages:
             try:
                 ext_root = module_dir(ext)
                 ext_dir_temp = os.path.join(ext_root, category, ext_name)

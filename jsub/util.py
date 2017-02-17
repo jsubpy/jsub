@@ -23,13 +23,3 @@ def safe_copy(src, dst):
         directory = os.path.dirname(dst)
         safe_mkdir(directory)
     shutil.copy2(src, dst)
-
-
-def dict_deep_update(d, u):
-    for k, v in u.items():
-        if isinstance(v, collections.Mapping):
-            r = dict_deep_update(d.get(k, {}), v)
-            d[k] = r
-        else:
-            d[k] = u[k]
-    return d

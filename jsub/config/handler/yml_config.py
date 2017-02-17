@@ -1,1 +1,1 @@
-from jsub.config.yaml_config import YamlConfig as YmlConfig
+from jsub.config.handler.yaml_config import YamlConfig as YmlConfig
