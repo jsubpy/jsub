@@ -1,3 +1,4 @@
+include jsub/VERSION
 include jsub/support/jsubrc.example
 recursive-include jsub/exts/action *
 recursive-include jsub/exts/bootstrap *

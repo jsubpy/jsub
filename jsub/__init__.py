@@ -21,8 +21,8 @@ class Jsub(object):
         self.__manager.init_logging()
 
 
-    def version(self):
-        return self.__manager.version()
+    def ls_ext(self):
+        return self.__manager.extensions()
 
 
     def __load_operation(self):
