@@ -85,9 +85,11 @@ class ConfigManager(object):
                 raise BackendNotSetupError('Backend value format not correct')
 
         backend_type = self.__config.get('backend', {}).get('predefined').get(backend_name, {}).get('type')
-        backend_param = self.__config.get('backend', {}).get('predefined').get(backend_name, {}).get('param')
+        backend_launcher = self.__config.get('backend', {}).get('predefined').get(backend_name, {}).get('launcher')
+        backend_param = self.__config.get('backend', {}).get('predefined').get(backend_name, {}).get('param', {})
 #        backend_param.update(backend_param_profile)
 
-        backend_param['default_work_dir'] = self.__config['backend'].get('work_dir', '~/jsub/work')
+        if 'work_dir' not in backend_param:
+            backend_param['work_dir'] = self.__config['backend'].get('work_dir', '~/jsub/work')
 
-        return {'type': backend_type, 'param': backend_param}
+        return {'type': backend_type, 'launcher': backend_launcher, 'param': backend_param}

@@ -15,4 +15,4 @@ class LauncherManager(object):
         dst_exe = os.path.join(dst_dir, executable)
         safe_copy(src_exe, dst_exe)
 
-        return executable
+        return launcher_param

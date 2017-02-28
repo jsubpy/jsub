@@ -33,9 +33,10 @@ class Local(Common):
 
         self._logger = logging.getLogger('JSUB')
 
-        self.initialize_common_param()
         self._foreground = param.get('foreground', False)
         self._max_submit = param.get('max_submit', 4)
+
+        self.initialize_common_param()
 
     def property(self):
         return {'run_on': 'local'}

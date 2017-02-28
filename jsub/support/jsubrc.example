@@ -30,21 +30,20 @@ backend:
   predefined:
     local:
       type: local
-      param:
-        launcher: arg
-        work_dir: ~/jsub/work
+      launcher: arg
     fg:
       type: local
+      launcher: arg
       param:
-        launcher: arg
-        work_dir: ~/jsub/work
         foreground: True
     condor:
       type: condor
+      launcher: arg
       param:
         work_dir: ~/jsub/work
     dirac:
       type: dirac
+      launcher: arg
       param:
         site:
           - CLOUD.IHEP.cn

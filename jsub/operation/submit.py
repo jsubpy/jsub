@@ -43,9 +43,9 @@ class Submit(object):
         self.__create_navigator(main_root)
         self.__create_bootstrap(main_root)
 
-        launcher_exe = self.__create_launcher(work_root)
+        launcher_param = self.__create_launcher(work_root)
 
-        self.__submit(launcher_exe)
+        self.__submit(launcher_param)
 
 
     def __create_input(self, main_root):
@@ -89,13 +89,13 @@ class Submit(object):
         self.__bootstrap_mgr.create_bootstrap(bootstrap, bootstrap_dir)
 
     def __create_launcher(self, work_root):
-        launcher = self.__task.data['backend']['param']['launcher']
+        launcher = self.__task.data['backend']['launcher']
         return self.__launcher_mgr.create_launcher(launcher, work_root)
 
 
-    def __submit(self, launcher_exe):
+    def __submit(self, launcher_param):
         if self.__dry_run:
             return
-        result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['id'], self.__sub_ids, launcher_exe)
+        result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['id'], self.__sub_ids, launcher_param)
 
         self.__logger.debug(result)
