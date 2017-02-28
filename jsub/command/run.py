@@ -18,4 +18,4 @@ class Run(object):
         task = j.create(task_profile)
         j.submit(task, dry_run=self.__dry_run)
 
-        click.echo('Task %s submitted: %s' % (task.data['task_id'], task.data['name']))
+        click.echo('Task %s submitted: %s' % (task.data['id'], task.data['name']))

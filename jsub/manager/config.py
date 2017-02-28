@@ -1,4 +1,3 @@
-from jsub.util          import ensure_list
 from jsub.config        import load_config_file
 from jsub.manager.error import BackendNotSetupError
 
@@ -15,19 +14,18 @@ class ConfigManager(object):
         self.__config_jsubrc = self.__schema_mgr.validate_jsubrc_config(load_config_file(jsubrc))
         self.__config = self.__config_jsubrc
 
-    def packages_jsubrc(self):
-        packages = []
-        if 'package' in self.__config_jsubrc:
-            packages = ensure_list(self.__config_jsubrc['package'])
-        print(packages)
-        return packages + ['jsub.exts']
-
-    def config(self, item):
+    def config_jsubrc(self, item):
         if item in self.__config_jsubrc:
             return self.__config_jsubrc[item]
         if item in default_settings:
             return default_settings[item]
         raise ConfigNotSetupError('Configuration not found for: %s' % item)
+
+    def config(self, item):
+        return self.config_jsubrc(item)
+
+    def merge_packages_config(self, packages_config):
+        pass
 
     def repo(self):
         if 'repo' in self.__config:
@@ -71,7 +69,7 @@ class ConfigManager(object):
     def backend_data(self, task_profile):
         if 'backend' not in task_profile:
             try:
-                backend_name = self.__config['backend']
+                backend_name = self.__config['backend']['default']
             except KeyError:
                 raise BackendNotSetupError('Must specify a backend')
         else:
@@ -86,10 +84,10 @@ class ConfigManager(object):
             else:
                 raise BackendNotSetupError('Backend value format not correct')
 
-        backend_type = self.__config.get('backends', {}).get(backend_name, {}).get('type')
-        backend_param = self.__config.get('backends', {}).get(backend_name, {}).get('param')
+        backend_type = self.__config.get('backend', {}).get('predefined').get(backend_name, {}).get('type')
+        backend_param = self.__config.get('backend', {}).get('predefined').get(backend_name, {}).get('param')
 #        backend_param.update(backend_param_profile)
 
-        backend_param['default_work_dir'] = self.__config.get('work_dir', '~/jsub/work')
+        backend_param['default_work_dir'] = self.__config['backend'].get('work_dir', '~/jsub/work')
 
         return {'type': backend_type, 'param': backend_param}

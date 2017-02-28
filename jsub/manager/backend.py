@@ -6,9 +6,9 @@ class BackendManager(object):
         backend = self.__ext_mgr.load_ext_common('backend', backend_data)
         return backend.property()
 
-    def work_root(self, backend_data, task_id):
+    def get_work_root(self, backend_data, task_id):
         backend = self.__ext_mgr.load_ext_common('backend', backend_data)
-        return backend.work_root(task_id)
+        return backend.get_work_root(task_id)
 
     def submit(self, backend_data, task_id, sub_ids, launcher_exe):
         backend = self.__ext_mgr.load_ext_common('backend', backend_data)

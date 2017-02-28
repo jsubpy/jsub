@@ -1,6 +1,7 @@
 import os
 
-from jsub.log               import add_stream_logger
+from jsub.log  import add_stream_logger
+from jsub.util import ensure_list
 
 
 class Manager(object):
@@ -46,6 +47,7 @@ class Manager(object):
         if self.__pkg_mgr is None:
             from jsub.manager.package import PackageManager
             packages = self.load_config_manager().config_jsubrc('package')
+            packages = ensure_list(packages)
             self.__pkg_mgr = PackageManager(self.load_schema_manager(), packages)
         return self.__pkg_mgr
 

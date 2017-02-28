@@ -16,4 +16,4 @@ class Create(object):
         task_profile = load_config_file(self.__task_profile_file)
         task = j.create(task_profile)
 
-        click.echo('Task %s created: %s' % (task.data['task_id'], task.data['name']))
+        click.echo('Task %s created: %s' % (task.data['id'], task.data['name']))

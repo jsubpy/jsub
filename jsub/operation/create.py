@@ -45,7 +45,7 @@ class Create(object):
         task_data['backend']    = backend_data
         task_data['status']     = 'NEW'
         task = self.__create_task(task_data)
-        task_id = task.data['task_id']
+        task_id = task.data['id']
 
         self.__copy_input_file(task_id, app_input)
         self.__dump_task_profile(task_id)

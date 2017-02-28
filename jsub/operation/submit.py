@@ -30,7 +30,7 @@ class Submit(object):
 
 
     def handle(self):
-        work_root = self.__backend_mgr.work_root(self.__task.data['backend'], self.__task.data['task_id'])
+        work_root = self.__backend_mgr.get_work_root(self.__task.data['backend'], self.__task.data['id'])
 
         main_root = os.path.join(work_root, 'main')
 
@@ -50,7 +50,7 @@ class Submit(object):
 
     def __create_input(self, main_root):
         content = self.__manager.load_content()
-        content.get(self.__task.data['task_id'], 'input', os.path.join(main_root, 'input'))
+        content.get(self.__task.data['id'], 'input', os.path.join(main_root, 'input'))
 
     def __create_scenario(self, main_root):
         scenario_dir = os.path.join(main_root, 'scenario')
@@ -96,6 +96,6 @@ class Submit(object):
     def __submit(self, launcher_exe):
         if self.__dry_run:
             return
-        result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['task_id'], self.__sub_ids, launcher_exe)
+        result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['id'], self.__sub_ids, launcher_exe)
 
         self.__logger.debug(result)

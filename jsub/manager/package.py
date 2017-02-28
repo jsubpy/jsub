@@ -1,18 +1,29 @@
 import logging
 
+from jsub.error import JsubError
+
 from jsub.loader import package_dir
-from jsub.util   import ensure_list
-from jsub.util   import unique_list
+from jsub.loader import LoadError
 
 from jsub.config import find_and_load_config_file
 from jsub.config import ConfigFileNotFoundError
 
+from jsub.util import ensure_list
+from jsub.util import unique_list
+
+
+class PackageNotFoundError(JsubError):
+    pass
+
+
 PACKAGE_CONFIG_NAME = 'config'
 
 def _package_config(package):
-    pkg_dir = package_dir(package)
     try:
+        pkg_dir = package_dir(package)
         return find_and_load_config_file(pkg_dir, PACKAGE_CONFIG_NAME)
+    except LoadError as e:
+        raise PackageNotFoundError('Package "%s" not found: %s' % (package, e))
     except ConfigFileNotFoundError as e:
         return {}
 

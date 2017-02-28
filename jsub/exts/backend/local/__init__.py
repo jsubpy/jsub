@@ -1,16 +1,12 @@
-run_on = 'local'
-run_on = 'remote'
-
 import os
 import time
 import subprocess
 import logging
 
-CLOCK_TICKS = os.sysconf('SC_CLK_TCK')
-
-from jsub.util import safe_mkdir
-
 from jsub.mixin.backend.common import Common
+
+
+CLOCK_TICKS = os.sysconf('SC_CLK_TCK')
 
 def _process_start_time(pid):
     start_time = 0
@@ -42,7 +38,7 @@ class Local(Common):
         self._max_submit = param.get('max_submit', 4)
 
     def property(self):
-        return {}
+        return {'run_on': 'local'}
 
     def submit(self, task_id, sub_ids, launcher_exe):
         processes = {}
@@ -53,7 +49,7 @@ class Local(Common):
                 break
 
             try:
-                launcher = os.path.join(self.work_root(task_id), launcher_exe)
+                launcher = os.path.join(self.get_work_root(task_id), launcher_exe)
                 FNULL = open(os.devnull, 'w')
                 process = subprocess.Popen([launcher, str(sub_id)], stdout=FNULL, stderr=subprocess.STDOUT)
                 start_time = _process_start_time(process.pid)

@@ -49,7 +49,7 @@ class ScenarioManager(object):
             sub_id += 1
 
         scenario['general'] = {}
-        scenario['general']['task_id']   = task_data['task_id']
+        scenario['general']['task_id']   = task_data['id']
         scenario['general']['app']       = task_data['app']['type']
         scenario['general']['task_name'] = task_data['name']
         scenario['general']['backend']   = task_data['backend']['type']

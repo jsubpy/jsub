@@ -1,7 +1,7 @@
 log_level: DEBUG
 time_zone: utc
 
-package: jsub_cepc
+package: [jsub_cepc, jsub_dirac, jsub.exts]
 
 max_jobs_per_task: 100000
 list_tasks_recent_days: 60

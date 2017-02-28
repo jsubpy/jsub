@@ -2,17 +2,34 @@ class JsubError(Exception):
     pass
 
 
-class SplitterParamError(JsubError):
+class SplitterError(JsubError):
     pass
 
-class LauncherNotFoundError(JsubError):
+class SplitterParamError(SplitterError):
     pass
 
 
-class TaskIdFormatError(JsubError):
+class LauncherError(JsubError):
     pass
 
-class TaskNotFoundError(JsubError):
+class LauncherNotFoundError(LauncherError):
+    pass
+
+
+class BackendError(JsubError):
+    pass
+
+class BackendNotFoundError(BackendError):
+    pass
+
+
+class TaskError(JsubError):
+    pass
+
+class TaskIdFormatError(TaskError):
+    pass
+
+class TaskNotFoundError(TaskError):
     pass
 
 
