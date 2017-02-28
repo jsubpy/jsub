@@ -9,11 +9,14 @@ from jsub.loader import ModuleNotFoundError, ClassNotFoundError, NotAClassError
 @pytest.fixture(scope='module', autouse=True)
 def setup_python_path():
     current_path = os.path.dirname(os.path.abspath(__file__))
-    load_path1 = os.path.join(current_path, 'test_loader', 'load1')
-    load_path2 = os.path.join(current_path, 'test_loader', 'load2')
+    loader_path = os.path.join(current_path, 'fixtures', 'packages', 'loader')
+    load_path1 = os.path.join(loader_path, 'load1')
+    load_path2 = os.path.join(loader_path, 'load2')
     sys.path.insert(0, load_path1)
     sys.path.insert(0, load_path2)
-    print(sys.path)
+    yield
+    sys.path.remove(load_path2)
+    sys.path.remove(load_path1)
 
 
 def test_load_instances():

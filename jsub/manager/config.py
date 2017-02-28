@@ -1,6 +1,7 @@
+from jsub.util          import ensure_list
 from jsub.config        import load_config_file
-
 from jsub.manager.error import BackendNotSetupError
+
 
 class ConfigManager(object):
     default_settings = {
@@ -9,22 +10,21 @@ class ConfigManager(object):
         'max_cycle': 10000,
     }
 
-    def __init__(self, jsubrc):
-        self.__config = load_config_file(jsubrc)
+    def __init__(self, schema_mgr, jsubrc):
+        self.__schema_mgr = schema_mgr
+        self.__config_jsubrc = self.__schema_mgr.validate_jsubrc_config(load_config_file(jsubrc))
+        self.__config = self.__config_jsubrc
 
-    def packages_directly(self):
+    def packages_jsubrc(self):
         packages = []
-        if 'package' in self.__config:
-            package = self.__config['package']
-            if isinstance(package, list):
-                packages += package
-            else:
-                packages.append(package)
+        if 'package' in self.__config_jsubrc:
+            packages = ensure_list(self.__config_jsubrc['package'])
+        print(packages)
         return packages + ['jsub.exts']
 
-    def setting(self, item):
-        if item in self.__config:
-            return self.__config[item]
+    def config(self, item):
+        if item in self.__config_jsubrc:
+            return self.__config_jsubrc[item]
         if item in default_settings:
             return default_settings[item]
         raise ConfigNotSetupError('Configuration not found for: %s' % item)
@@ -42,7 +42,7 @@ class ConfigManager(object):
             return self.__config['content']
         config_content = {}
         config_content['type'] = 'file_system'
-        config_content['param'] = {'dir': '~/jsub/repo'}
+        config_content['param'] = {'dir': '~/jsub/content'}
         return config_content
 
     def bootstrap(self):

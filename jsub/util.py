@@ -23,3 +23,14 @@ def safe_copy(src, dst):
         directory = os.path.dirname(dst)
         safe_mkdir(directory)
     shutil.copy2(src, dst)
+
+
+def ensure_list(item):
+    return item if isinstance(item, list) else [item]
+
+def unique_list(seq):
+    unique = []
+    for item in seq:
+        if item not in unique:
+            unique.append(item)
+    return unique

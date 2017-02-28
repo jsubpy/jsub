@@ -56,9 +56,11 @@ setup(
     keywords = 'Job submission tools',
     packages = find_packages(exclude=[]),
     install_requires = [
-        'click',
-        'PyYAML',
-        'pytoml',
+        'click >=6.0 <7.0',
+        'PyYAML >=3.0 <4.0',
+        'pytoml >=0.1 <0.2',
+        'schema >=0.6 <0.7',
+        'pytz',
     ],
     include_package_data = True,
     tests_require = [

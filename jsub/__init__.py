@@ -19,10 +19,14 @@ class Jsub(object):
         self.__operation = None
 
         self.__manager.init_logging()
+        self.__manager.init_config()
 
 
     def package(self):
         return self.__manager.load_pkg_manager().packages()
+
+    def config(self):
+        return self.__manager.load_config_manager().config()
 
 
     def __load_operation(self):

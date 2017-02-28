@@ -67,7 +67,7 @@ class Local(Common):
             processes[sub_id]['start_time'] = start_time
 
         if self._foreground:
-            for sub_id, data in processes.items():
+            for _, data in processes.items():
                 data['process'].wait()
 
         result = {}

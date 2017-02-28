@@ -17,7 +17,7 @@ class ClassNotFoundError(LoadError):
 class NotAClassError(LoadError):
     pass
 
-class ModuleDirectoryNotFoundError(LoadError):
+class PackageDirectoryNotFoundError(LoadError):
     pass
 
 
@@ -43,9 +43,9 @@ def load_class(module_name, class_name):
     return c
 
 
-def module_dir(module_name):
+def package_dir(module_name):
     m = load_module(module_name)
     module_path = m.__file__
     if not os.path.basename(module_path).startswith('__init__.'):
-        raise ModuleDirectoryNotFoundError('Module "%s" does not hold a directory' % module_name)
+        raise PackageDirectoryNotFoundError('Package directory is not found for module "%s"' % module_name)
     return os.path.dirname(os.path.realpath(module_path))

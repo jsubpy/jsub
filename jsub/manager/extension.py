@@ -2,12 +2,13 @@ import os
 import logging
 
 from jsub.manager.error import ExtensionNotFoundError
-from jsub.config        import ConfigFileNotFoundError
 
-from jsub.loader import load_class, module_dir
+from jsub.loader import load_class, package_dir
 from jsub.loader import LoadError
 
 from jsub.config import find_and_load_config_file
+from jsub.config import ConfigFileNotFoundError
+
 from jsub.util   import snake_to_camel
 
 
@@ -36,7 +37,7 @@ class ExtensionManager(object):
     def ext_dir(self, category, ext_name):
         for ext in self.__packages:
             try:
-                ext_root = module_dir(ext)
+                ext_root = package_dir(ext)
                 ext_dir_temp = os.path.join(ext_root, category, ext_name)
                 if os.path.isdir(ext_dir_temp):
                     return ext_dir_temp

@@ -8,6 +8,7 @@ class Manager(object):
         self.__jsubrc     = os.path.expanduser(jsubrc)
         self.__root_dir   = root_dir
 
+        self.__schema_mgr = None
         self.__config_mgr = None
         self.__pkg_mgr    = None
         self.__ext_mgr    = None
@@ -19,26 +20,38 @@ class Manager(object):
 
 
     def init_logging(self):
-        level = self.load_config_manager().setting('log_level')
+        level = self.load_config_manager().config('log_level')
         add_stream_logger(level)
 
+    def init_config(self):
+        self.load_config_manager()
+        self.load_pkg_manager()
+        packages_config = self.__pkg_mgr.packages_config()
+        self.__config_mgr.merge_packages_config(packages_config)
+
+
+    def load_schema_manager(self):
+        if self.__schema_mgr is None:
+            from jsub.manager.schemaconfig import SchemaManager
+            self.__schema_mgr = SchemaManager()
+        return self.__schema_mgr
 
     def load_config_manager(self):
-        from jsub.manager.config import ConfigManager
         if self.__config_mgr is None:
-            self.__config_mgr = ConfigManager(self.__jsubrc)
+            from jsub.manager.config import ConfigManager
+            self.__config_mgr = ConfigManager(self.load_schema_manager(), self.__jsubrc)
         return self.__config_mgr
 
     def load_pkg_manager(self):
-        from jsub.manager.package import PackageManager
         if self.__pkg_mgr is None:
-            packages = self.load_config_manager().packages_directly()
-            self.__pkg_mgr = PackageManager(packages)
+            from jsub.manager.package import PackageManager
+            packages = self.load_config_manager().config_jsubrc('package')
+            self.__pkg_mgr = PackageManager(self.load_schema_manager(), packages)
         return self.__pkg_mgr
 
     def load_ext_manager(self):
-        from jsub.manager.extension import ExtensionManager
         if self.__ext_mgr is None:
+            from jsub.manager.extension import ExtensionManager
             packages = self.load_pkg_manager().packages()
             self.__ext_mgr = ExtensionManager(packages)
         return self.__ext_mgr
@@ -91,8 +104,8 @@ class Manager(object):
 
 
     def load_task_pool(self):
-        from jsub.task import TaskPool
         if self.__task_pool is None:
+            from jsub.task import TaskPool
             self.__task_pool = TaskPool(self.load_repo())
         return self.__task_pool
 
