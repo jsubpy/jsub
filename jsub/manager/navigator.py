@@ -18,20 +18,19 @@ class NavigatorManager(object):
         return formats
 
     def create_navigators(self, navigators, dst_dir):
-        digit_number = len(str(len(navigators) - 1))
-        navigator_format = '%%0%dd-%%s' % max(digit_number, 2)
-        navigator_index = 0
         for navigator_type in navigators:
             nav_dir = self.__ext_mgr.ext_dir('navigator', navigator_type)
             nav_param = self.__nav_param(navigator_type)
             executable = nav_param.get('executable', 'navigator')
 
             src_exe = os.path.join(nav_dir, executable)
-            indexed_name = navigator_format % (navigator_index, navigator_type)
-            dst_exe = os.path.join(dst_dir, indexed_name, executable)
+            dst_exe = os.path.join(dst_dir, navigator_type, executable)
             safe_copy(src_exe, dst_exe)
 
-            with open(os.path.join(os.path.join(dst_dir, indexed_name), 'executable'), 'w') as f:
+            with open(os.path.join(dst_dir, navigator_type, 'executable'), 'w') as f:
                 f.write(executable)
 
-            navigator_index += 1
+        with open(os.path.join(dst_dir, 'navigator.list'), 'w') as f:
+            for navigator_type in navigators:
+                f.write(navigator_type)
+                f.write('\n')
