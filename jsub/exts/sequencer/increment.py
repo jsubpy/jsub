@@ -1,4 +1,4 @@
-class Sequence(object):
+class Increment(object):
     def __init__(self, param):
         self.__first = param.get('first', 1)
         self.__last  = param.get('last')

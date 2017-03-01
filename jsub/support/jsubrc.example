@@ -51,6 +51,6 @@ backend:
           - CLUSTER.USTC.cn
 
 aux:
-  after_split: []
+  after_sequence: []
   before_submit: []
   after_submit: [dirac_task]

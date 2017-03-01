@@ -22,7 +22,7 @@ class ContentNotSetupError(ExtensionNotSetupError):
 class AppNotSetupError(ExtensionNotSetupError):
     pass
 
-class SplitterNotSetupError(ExtensionNotSetupError):
+class SequencerNotSetupError(ExtensionNotSetupError):
     pass
 
 class BackendNotSetupError(ExtensionNotSetupError):

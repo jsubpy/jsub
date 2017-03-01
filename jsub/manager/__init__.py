@@ -63,9 +63,9 @@ class Manager(object):
         from jsub.manager.app import AppManager
         return AppManager(self.load_ext_manager())
 
-    def load_splitter_manager(self):
-        from jsub.manager.splitter import SplitterManager
-        return SplitterManager(self.load_ext_manager())
+    def load_seq_manager(self):
+        from jsub.manager.sequencer import SequencerManager
+        return SequencerManager(self.load_ext_manager())
 
     def load_backend_manager(self):
         from jsub.manager.backend import BackendManager

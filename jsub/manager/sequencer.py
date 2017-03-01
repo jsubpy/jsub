@@ -1,3 +1,5 @@
+from jsub.manager.error import SequencerNotSetupError
+
 def _jobvar_name_map(jobvar_single, name_map):
     jobvar_new = {}
     for k, v in jobvar_single.items():
@@ -8,19 +10,19 @@ def _jobvar_name_map(jobvar_single, name_map):
     return jobvar_new
 
 
-class SplitterManager(object):
+class SequencerManager(object):
     def __init__(self, ext_mgr):
         self.__ext_mgr = ext_mgr
 
-    def split(self, splitters, max_cycle=100000):
-        splitter_content = {}
-        for splitter, value in splitters.items():
+    def sequence(self, sequencers, max_cycle=100000):
+        sequencer_content = {}
+        for sequencer, value in sequencers.items():
             if 'type' not in value:
-                raise SplitterNotSetupError('Splitter type not setup: %s', splitter)
+                raise SequencerNotSetupError('Sequencer type not setup: %s', sequencer)
 
-            splitter_content[splitter] = {}
-            splitter_content[splitter]['instance'] = self.__ext_mgr.load_ext_common('splitter', value)
-            splitter_content[splitter]['name_map'] = value.get('name_map', {})
+            sequencer_content[sequencer] = {}
+            sequencer_content[sequencer]['instance'] = self.__ext_mgr.load_ext_common('sequencer', value)
+            sequencer_content[sequencer]['name_map'] = value.get('name_map', {})
 
         jobvars = []
         cycle = 0
@@ -29,7 +31,7 @@ class SplitterManager(object):
 
             jobvar = {}
             try:
-                for splitter, content in splitter_content.items():
+                for sequencer, content in sequencer_content.items():
                     jobvar_single = content['instance'].next()
                     jobvar.update(_jobvar_name_map(jobvar_single, content['name_map']))
             except StopIteration:

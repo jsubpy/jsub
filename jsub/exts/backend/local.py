@@ -41,7 +41,9 @@ class Local(Common):
     def property(self):
         return {'run_on': 'local'}
 
-    def submit(self, task_id, sub_ids, launcher_exe):
+    def submit(self, task_id, sub_ids, launcher_param):
+        launcher_exe = launcher_param['executable']
+
         processes = {}
 
         count = 0

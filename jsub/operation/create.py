@@ -10,11 +10,11 @@ class Create(object):
         self.__initialize_manager()
 
     def __initialize_manager(self):
-        self.__config_mgr   = self.__manager.load_config_manager()
+        self.__config_mgr  = self.__manager.load_config_manager()
 
-        self.__app_mgr      = self.__manager.load_app_manager()
-        self.__splitter_mgr = self.__manager.load_splitter_manager()
-        self.__backend_mgr  = self.__manager.load_backend_manager()
+        self.__app_mgr     = self.__manager.load_app_manager()
+        self.__seq_mgr     = self.__manager.load_seq_manager()
+        self.__backend_mgr = self.__manager.load_backend_manager()
 
 
     def handle(self):
@@ -26,12 +26,12 @@ class Create(object):
         app_data = self.__config_mgr.app_data(self.__task_profile)
         app_result = self.__app_mgr.build(app_data, backend_property)
 
-        app_input = app_result.get('input',    {})
-        workflow  = app_result.get('workflow', {})
-        prop      = app_result.get('prop',     {})
-        splitter  = app_result.get('splitter', {})
+        app_input = app_result.get('input',     {})
+        workflow  = app_result.get('workflow',  {})
+        prop      = app_result.get('prop',      {})
+        sequencer = app_result.get('sequencer', {})
 
-        jobvar = self.__splitter_mgr.split(splitter)
+        jobvar = self.__seq_mgr.sequence(sequencer)
 
         task_data = {}
         task_data['name']       = task_name
@@ -39,7 +39,7 @@ class Create(object):
         task_data['workflow']   = workflow
         task_data['event']      = {}
         task_data['prop']       = prop
-        task_data['splitter']   = splitter
+        task_data['sequencer']  = sequencer
         task_data['jobvar']     = jobvar
         task_data['input_file'] = list(app_input.keys())
         task_data['backend']    = backend_data
