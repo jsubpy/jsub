@@ -15,6 +15,11 @@ class SequencerManager(object):
         self.__ext_mgr = ext_mgr
 
     def sequence(self, sequencers, max_cycle=100000):
+        jobvars = []
+
+        if not sequencers:
+            return jobvars
+
         sequencer_content = {}
         for sequencer, value in sequencers.items():
             if 'type' not in value:
@@ -24,7 +29,6 @@ class SequencerManager(object):
             sequencer_content[sequencer]['instance'] = self.__ext_mgr.load_ext_common('sequencer', value)
             sequencer_content[sequencer]['name_map'] = value.get('name_map', {})
 
-        jobvars = []
         cycle = 0
         while cycle < max_cycle:
             cycle += 1
