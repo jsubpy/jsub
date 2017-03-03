@@ -51,4 +51,5 @@ class ExtensionManager(object):
             return find_and_load_config_file(self.ext_dir(category, ext_name), config_name)
         except ConfigFileNotFoundError as e:
             self.__logger.debug('Extension config not found, use empty config')
+            self.__logger.debug(' - %s' % e)
             return {}

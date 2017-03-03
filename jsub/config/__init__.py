@@ -68,7 +68,7 @@ def find_and_load_config_file(directory, name):
                 _jsub_logger.debug('Skip unknown config file "%s": %s' % (full_path, e))
                 continue
 
-    raise ConfigFileNotFoundError('Could not find config "%s" from directory "%s"' % (name, directory))
+    raise ConfigFileNotFoundError('Config "%s" not found in directory "%s"' % (name, directory))
 
 def dump_config_string(config, fmt):
     config_handler = _config_handler(fmt)

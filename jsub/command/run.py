@@ -11,11 +11,12 @@ class Run(object):
         self.__dry_run = dry_run
 
     def execute(self):
-        click.echo('Running')
-
         j = Jsub(self.__jsubrc)
         task_profile = load_config_file(self.__task_profile_file)
         task = j.create(task_profile)
         j.submit(task, dry_run=self.__dry_run)
 
-        click.echo('Task %s submitted: %s' % (task.data['id'], task.data['name']))
+        click.echo('Task submitted successfully')
+        click.echo('- ID         : %s' % task.data['id'])
+        click.echo('- Name       : %s' % task.data['name'])
+        click.echo('- Job Number : %s' % len(task.data['jobvar']))
