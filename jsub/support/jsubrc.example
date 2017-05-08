@@ -1,4 +1,5 @@
-log_level: DEBUG
+#log_level: DEBUG
+log_level: INFO
 time_zone: utc
 
 package: [jsub_cepc, jsub_dirac, jsub.exts]

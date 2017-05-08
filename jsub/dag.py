@@ -2,13 +2,13 @@ import random
 import copy
 
 
-class DAGVertexNotFoundError(Exception):
+class DagVertexNotFoundError(Exception):
     pass
 
-class DAGEdgeNotFoundError(Exception):
+class DagEdgeNotFoundError(Exception):
     pass
 
-class DAGCycleError(Exception):
+class DagCycleError(Exception):
     pass
 
 
@@ -28,61 +28,98 @@ def dag_has_path_to(v_from, v_to, graph):
     return False
 
 
-class DAG:
+class UnorderedGraph(object):
     def __init__(self):
         self.__graph = {}
         self.__graph_reverse = {}
 
+        self.__starts = set()
+        self.__terminals = set()
 
-    def __validate_vertex(self, *vertice):
-        for vertex in vertice:
-            if vertex not in self.__graph:
-                raise DAGVertexNotFoundError('Vertex "%s" does not belong to DAG' % vertex)
+
+    def is_vertex_valid(self, vertex):
+        return vertex in self.__graph
+
+    def is_edge_valid(self, v_from, v_to):
+        return (v_from in self.__graph) and (v_to in self.__graph[v_from])
+
+    def has_path_to(self, v_from, v_to):
+        return dag_has_path_to(v_from, v_to, self.__graph)
+
+
+    def vertice(self):
+        return self.graph.keys()
 
 
     def add_vertex(self, vertex):
         if vertex not in self.__graph:
+            self.__starts.add(vertex)
+            self.__terminals.add(vertex)
             self.__graph[vertex] = set()
             self.__graph_reverse[vertex] = set()
 
     def add_edge(self, v_from, v_to):
-        self.__validate_vertex(v_from, v_to)
-        if dag_has_path_to(v_to, v_from, self.__graph):
-            raise DAGCycleError('Cycle if add edge from "%s" to "%s"' % (v_from, v_to))
-
         self.__graph[v_from].add(v_to)
         self.__graph_reverse[v_to].add(v_from)
 
     def remove_edge(self, v_from, v_to):
-        self.__validate_vertex(v_from, v_to)
-        if v_to not in self.__graph[v_from]:
-            raise DAGEdgeNotFoundError('Edge not found from "%s" to "%s"' % (v_from, v_to))
-
         self.__graph[v_from].remove(v_to)
         self.__graph_reverse[v_to].remove(v_from)
 
 
+class Dag(object):
+    def __init__(self, handler):
+        self.__handler = handler
+
+    def __validate_vertex(self, *vertice):
+        for vertex in vertice:
+            if not self.__handler.is_vertex_valid(vertex):
+                raise DagVertexNotFoundError('Vertex "%s" does not belong to DAG' % vertex)
+
+
+    def add_vertex(self, *vertice):
+        for vertex in vertice:
+            self.__handler.add_vertex(vertex)
+
+    def add_edge(self, v_from, *v_tos):
+        self.__validate_vertex(v_from, *v_tos)
+
+        for v_to in v_tos:
+            if self.__handler.has_path_to(v_to, v_from):
+                raise DagCycleError('Cycle if add edge from "%s" to "%s"' % (v_from, v_to))
+            self.__handler.add_edge(v_from, v_to)
+
+    def remove_edge(self, v_from, v_to):
+        self.__validate_vertex(v_from, v_to)
+        if not self.__handler.is_edge_valid(v_from, v_to):
+            raise DagEdgeNotFoundError('Edge not found from "%s" to "%s"' % (v_from, v_to))
+
+        self.__handler.remove_edge(v_from, v_to)
+
+
     def edge_size(self):
         size = 0
-        for vertex in self.__graph:
+        for vertex in self.__handler.vertice():
             size += self.indegree(vertex)
         return size
 
+
     def successors(self, vertex):
         self.__validate_vertex(vertex)
-        return set(self.__graph[vertex])
+        return self.__graph[vertex]
 
     def predecessors(self, vertex):
         self.__validate_vertex(vertex)
-        return set(self.__graph_reverse[vertex])
+        return self.__graph_reverse[vertex]
 
     def indegree(self, vertex):
         self.__validate_vertex(vertex)
-        return len(self.__graph_reverse[vertex])
+        return len(self.predecessors(vertex))
 
     def outdegree(self, vertex):
         self.__validate_vertex(vertex)
-        return len(self.__graph[vertex])
+        return len(self.successors(vertex))
+
 
     def all_starts(self):
         return dag_endpoints(self.__graph_reverse)
@@ -108,3 +145,13 @@ class DAG:
                     vertice_zero_indegree.add(v_to)
 
         return sorted_vertice
+
+
+class Dag(DagBase):
+    def __init__(self):
+        super(Dag, self).__init__()
+
+
+class OrderedDag(DagBase):
+    def __init__(self):
+        super(OrderedDag, self).__init__()

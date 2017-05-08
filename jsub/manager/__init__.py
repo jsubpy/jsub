@@ -2,12 +2,12 @@ import os
 
 from jsub.log  import add_stream_logger
 from jsub.util import ensure_list
+from jsub.util import expand_path
 
 
 class Manager(object):
-    def __init__(self, jsubrc, root_dir):
-        self.__jsubrc     = os.path.expanduser(jsubrc)
-        self.__root_dir   = root_dir
+    def __init__(self, jsubrc):
+        self.__jsubrc     = expand_path(jsubrc)
 
         self.__schema_mgr = None
         self.__config_mgr = None
@@ -19,15 +19,18 @@ class Manager(object):
 
         self.__task_pool  = None
 
+        self.__init_logging()
+        self.__init_config()
 
-    def init_logging(self):
+
+    def __init_logging(self):
         level = self.load_config_manager().config('log_level')
         add_stream_logger(level)
 
-    def init_config(self):
+    def __init_config(self):
         self.load_config_manager()
         self.load_pkg_manager()
-        packages_config = self.__pkg_mgr.packages_config()
+        packages_config = self.__pkg_mgr.packages_config
         self.__config_mgr.merge_packages_config(packages_config)
 
 

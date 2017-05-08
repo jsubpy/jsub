@@ -32,8 +32,9 @@ logging "Current directory: ${main_root}"
 
 
 logging "Search for valid navigator..."
-for navigator_dir in "${navigator_root}"/*
+for navigator_name in $(cat "${navigator_root}/navigator.list")
 do
+    navigator_dir="${navigator_root}/${navigator_name}"
     navigator_exe=$(cat "${navigator_dir}/executable")
     navigator_ok=$(${navigator_dir}/${navigator_exe} --validate 2>>$log_file)
     if [ $? = 0 -a "$navigator_ok" = 'JSUB navigator OK' ]; then

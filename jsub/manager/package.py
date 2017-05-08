@@ -31,7 +31,7 @@ def _package_config(package):
 class PackageManager(object):
     def __init__(self, schema_mgr, initial_packages):
         self.__schema_mgr = schema_mgr
-        self.__packages_config = {}
+        self.packages_config = {}
 
         self.__logger = logging.getLogger('JSUB')
 
@@ -46,14 +46,8 @@ class PackageManager(object):
             if 'package' in pkg_config:
                 sub_pkgs = ensure_list(pkg_config['package'])
                 pkgs.append(self.__package_deps(sub_pkgs))
-            self.__packages_config[pkg] = pkg_config
+            self.packages_config[pkg] = pkg_config
         return unique_list(pkgs)
 
     def __resolve_packages(self, initial_packages):
-        self.__packages = self.__package_deps(initial_packages)
-
-    def packages(self):
-        return self.__packages
-
-    def packages_config(self):
-        return self.__packages_config
+        self.packages = self.__package_deps(initial_packages)

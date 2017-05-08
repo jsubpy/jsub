@@ -15,11 +15,8 @@ def version():
 
 class Jsub(object):
     def __init__(self, jsubrc='~/.jsubrc'):
-        self.__manager = Manager(jsubrc, JSUB_ROOT_DIR)
+        self.__manager = Manager(jsubrc)
         self.__operation = None
-
-        self.__manager.init_logging()
-        self.__manager.init_config()
 
 
     def package(self):

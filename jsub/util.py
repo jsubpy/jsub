@@ -25,6 +25,10 @@ def safe_copy(src, dst):
     shutil.copy2(src, dst)
 
 
+def expand_path(path):
+    return os.path.expanduser(os.path.expandvars(path))
+
+
 def ensure_list(item):
     return item if isinstance(item, list) else [item]
 

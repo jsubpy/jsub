@@ -4,3 +4,6 @@ class Common(object):
 
     def build(self, backend):
         return self.__param
+
+    def validate_param(self):
+        pass

@@ -124,13 +124,13 @@ class ArgParser:
 ################################################################################
 # Defining the DAG
 
-class DAGVertexNotFoundError(Exception):
+class DagVertexNotFoundError(Exception):
     pass
 
-class DAGEdgeNotFoundError(Exception):
+class DagEdgeNotFoundError(Exception):
     pass
 
-class DAGCycleError(Exception):
+class DagCycleError(Exception):
     pass
 
 
@@ -150,7 +150,7 @@ def dag_has_path_to(v_from, v_to, graph):
     return False
 
 
-class DAG:
+class Dag:
     def __init__(self):
         self.__graph = {}
         self.__graph_reverse = {}
@@ -159,7 +159,7 @@ class DAG:
     def __validate_vertex(self, *vertice):
         for vertex in vertice:
             if vertex not in self.__graph:
-                raise DAGVertexNotFoundError('Vertex "%s" does not belong to DAG' % vertex)
+                raise DagVertexNotFoundError('Vertex "%s" does not belong to DAG' % vertex)
 
 
     def add_vertex(self, vertex):
@@ -170,7 +170,7 @@ class DAG:
     def add_edge(self, v_from, v_to):
         self.__validate_vertex(v_from, v_to)
         if dag_has_path_to(v_to, v_from, self.__graph):
-            raise DAGCycleError('Cycle if add edge from "%s" to "%s"' % (v_from, v_to))
+            raise DagCycleError('Cycle if add edge from "%s" to "%s"' % (v_from, v_to))
 
         self.__graph[v_from].add(v_to)
         self.__graph_reverse[v_to].add(v_from)
@@ -178,7 +178,7 @@ class DAG:
     def remove_edge(self, v_from, v_to):
         self.__validate_vertex(v_from, v_to)
         if v_to not in self.__graph[v_from]:
-            raise DAGEdgeNotFoundError('Edge not found from "%s" to "%s"' % (v_from, v_to))
+            raise DagEdgeNotFoundError('Edge not found from "%s" to "%s"' % (v_from, v_to))
 
         self.__graph[v_from].remove(v_to)
         self.__graph_reverse[v_to].remove(v_from)
@@ -192,11 +192,11 @@ class DAG:
 
     def successors(self, vertex):
         self.__validate_vertex(vertex)
-        return set(self.__graph[vertex])
+        return self.__graph[vertex]
 
     def predecessors(self, vertex):
         self.__validate_vertex(vertex)
-        return set(self.__graph_reverse[vertex])
+        return self.__graph_reverse[vertex]
 
     def indegree(self, vertex):
         self.__validate_vertex(vertex)
@@ -492,7 +492,7 @@ class Application:
         self.execute_dag()
 
     def generate_dag(self):
-        dag = DAG()
+        dag = Dag()
         for unit in self.__scenario_workflow:
             dag.add_vertex(unit)
         for unit, scenario_unit in self.__scenario_workflow.items():
