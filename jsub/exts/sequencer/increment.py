@@ -19,3 +19,6 @@ class Increment(object):
         value = self.__value
         self.__value += self.__step
         return {'value': value}
+
+    def length(self):
+        return None

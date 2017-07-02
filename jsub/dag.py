@@ -28,7 +28,7 @@ def dag_has_path_to(v_from, v_to, graph):
     return False
 
 
-class UnorderedGraph(object):
+class UnorderedHandler(object):
     def __init__(self):
         self.__graph = {}
         self.__graph_reverse = {}
@@ -65,6 +65,10 @@ class UnorderedGraph(object):
     def remove_edge(self, v_from, v_to):
         self.__graph[v_from].remove(v_to)
         self.__graph_reverse[v_to].remove(v_from)
+
+
+class OrderedHandler(object):
+    pass
 
 
 class Dag(object):
@@ -147,11 +151,11 @@ class Dag(object):
         return sorted_vertice
 
 
-class Dag(DagBase):
-    def __init__(self):
-        super(Dag, self).__init__()
-
-
-class OrderedDag(DagBase):
-    def __init__(self):
-        super(OrderedDag, self).__init__()
+#class Dag(DagBase):
+#    def __init__(self):
+#        super(Dag, self).__init__()
+#
+#
+#class OrderedDag(DagBase):
+#    def __init__(self):
+#        super(OrderedDag, self).__init__()
