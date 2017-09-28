@@ -1,6 +1,5 @@
 import os
 import shutil
-import collections
 
 def camel_to_snake(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
@@ -26,7 +25,9 @@ def safe_copy(src, dst):
 
 
 def expand_path(path):
-    return os.path.expanduser(os.path.expandvars(path))
+    temp_path = os.path.expanduser(path)
+    temp_path = os.path.expandvars(temp_path)
+    return os.path.normpath(temp_path)
 
 
 def ensure_list(item):

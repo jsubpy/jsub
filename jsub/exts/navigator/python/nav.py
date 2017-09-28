@@ -453,7 +453,7 @@ class TaskSubIdNotFoundError(Exception):
     pass
 
 
-class Application:
+class Navigator:
     def __init__(self, scenario):
         self.__scenario_general  = scenario['general']
 
@@ -521,7 +521,7 @@ class Application:
             for unit, info in units_info.items():
                 vertice_zero_indegree.remove(unit)
 
-                for to_unit in self.__dag_workflow.successors(unit):
+                for to_unit in self.__dag_workflow.successors(unit).copy():
 #                    self.__data_workflow[to_unit]['depvar'].update(self.__data_workflow[unit]['depvar'])
                     if 'depvar' in info['outvar']:
                         self.__data_workflow[to_unit]['depvar'].update(info['outvar']['depvar'])
@@ -555,8 +555,8 @@ def main():
         scenario = arg_parser.read_scenario()
         jsub_logger.debug('Read scenario: %s', scenario)
 
-        app = Application(scenario)
-        app.run()
+        nav = Navigator(scenario)
+        nav.run()
     except Exception:
         e = sys.exc_info()
         jsub_logger.exception('Exception caught (%s): %s' % (e[0].__name__, e[1]))
