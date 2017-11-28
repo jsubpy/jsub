@@ -55,3 +55,11 @@ aux:
   after_sequence: []
   before_submit: []
   after_submit: [dirac_task]
+
+match:
+  - boss
+  - dirac
+  - boss_dirac:
+      param:
+        boss: boss
+        dirac: dirac
