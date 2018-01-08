@@ -14,8 +14,8 @@ def version():
 
 
 class Jsub(object):
-    def __init__(self, jsubrc='~/.jsubrc'):
-        self.__manager = Manager(jsubrc)
+    def __init__(self, config_user='~/.jsub.conf'):
+        self.__manager = Manager(config_user)
         self.__operation = None
 
 

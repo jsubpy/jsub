@@ -9,20 +9,20 @@ class ConfigManager(object):
         'max_cycle': 10000,
     }
 
-    def __init__(self, schema_mgr, jsubrc):
+    def __init__(self, schema_mgr, config_user):
         self.__schema_mgr = schema_mgr
-        self.__config_jsubrc = self.__schema_mgr.validate_jsubrc_config(load_config_file(jsubrc))
-        self.__config = self.__config_jsubrc
+        self.__config_user = self.__schema_mgr.validate_user_config(load_config_file(config_user))
+        self.__config = self.__config_user
 
-    def config_jsubrc(self, item):
-        if item in self.__config_jsubrc:
-            return self.__config_jsubrc[item]
+    def config_user(self, item):
+        if item in self.__config_user:
+            return self.__config_user[item]
         if item in default_settings:
             return default_settings[item]
         raise ConfigNotSetupError('Configuration not found for: %s' % item)
 
     def config(self, item):
-        return self.config_jsubrc(item)
+        return self.config_user(item)
 
     def merge_packages_config(self, packages_config):
         pass

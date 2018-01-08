@@ -75,12 +75,12 @@ def _print_table(table_data, columns):
 
 
 class Ls(object):
-    def __init__(self, jsubrc, task_ids):
-        self.__jsubrc   = jsubrc
+    def __init__(self, config_user, task_ids):
+        self.__config_user   = config_user
         self.__task_ids = task_ids if len(task_ids) else None
 
     def execute(self):
-        j = Jsub(self.__jsubrc)
+        j = Jsub(self.__config_user)
         tasks_data = j.ls(self.__task_ids)
 
         columns = ['id', 'name', 'app', 'backend', 'status', 'created_at']

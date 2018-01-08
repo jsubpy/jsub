@@ -6,8 +6,8 @@ from jsub.util import expand_path
 
 
 class Manager(object):
-    def __init__(self, jsubrc):
-        self.__jsubrc     = expand_path(jsubrc)
+    def __init__(self, config_user):
+        self.__config_user = expand_path(config_user)
 
         self.__schema_mgr = None
         self.__config_mgr = None
@@ -43,13 +43,13 @@ class Manager(object):
     def load_config_manager(self):
         if self.__config_mgr is None:
             from jsub.manager.config import ConfigManager
-            self.__config_mgr = ConfigManager(self.load_schema_manager(), self.__jsubrc)
+            self.__config_mgr = ConfigManager(self.load_schema_manager(), self.__config_user)
         return self.__config_mgr
 
     def load_pkg_manager(self):
         if self.__pkg_mgr is None:
             from jsub.manager.package import PackageManager
-            packages = self.load_config_manager().config_jsubrc('package')
+            packages = self.load_config_manager().config_user('package')
             packages = ensure_list(packages)
             self.__pkg_mgr = PackageManager(self.load_schema_manager(), packages)
         return self.__pkg_mgr

@@ -22,7 +22,7 @@ class SchemaManager(object):
     def __init__(self):
         pass
 
-    def validate_jsubrc_config(self, config):
+    def validate_user_config(self, config):
         return config
 
     def validate_package_config(self, config):
