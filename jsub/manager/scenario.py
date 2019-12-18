@@ -57,5 +57,5 @@ class ScenarioManager(object):
         scenario['event'] = task_data['event']
 
         for fmt in scenario_format:
-            scenario_file = os.path.join(dst_dir, 'scenario.'+fmt)
+            scenario_file = os.path.join(dst_dir, 'scenario.'+fmt) 
             dump_config_file(scenario, scenario_file, fmt)

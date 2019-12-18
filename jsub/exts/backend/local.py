@@ -53,6 +53,7 @@ class Local(Common):
 
             try:
                 launcher = os.path.join(self.get_work_root(task_id), launcher_exe)
+
                 FNULL = open(os.devnull, 'w')
                 process = subprocess.Popen([launcher, str(sub_id)], stdout=FNULL, stderr=subprocess.STDOUT)
                 start_time = _process_start_time(process.pid)

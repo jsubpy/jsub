@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ $# != 1 ]; then
-    echo 'Need 1 arguments!'
+    echo 'Need 1 argument!'
     exit 1
 fi
 

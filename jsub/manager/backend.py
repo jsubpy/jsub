@@ -12,4 +12,5 @@ class BackendManager(object):
 
     def submit(self, backend_data, task_id, sub_ids, launcher_exe):
         backend = self.__ext_mgr.load_ext_common('backend', backend_data)
-        return backend.submit(task_id, sub_ids, launcher_exe)
+        submit_result= backend.submit(task_id, sub_ids, launcher_exe)
+        return(submit_result)

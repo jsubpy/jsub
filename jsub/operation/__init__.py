@@ -18,3 +18,7 @@ class Operation(object):
     def ls(self, task_id):
         from jsub.operation.ls import Ls
         return Ls(self.__manager, task_id).handle()
+
+    def show(self, task_id):
+        from jsub.operation.show import Show
+        return Show(self.__manager, task_id).handle()

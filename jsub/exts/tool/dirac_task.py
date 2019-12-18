@@ -1,0 +1,2 @@
+class DiracTask(object):
+    pass

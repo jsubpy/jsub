@@ -29,9 +29,9 @@ class Create(object):
         app_input = app_result.get('input',     {})
         workflow  = app_result.get('workflow',  {})
         prop      = app_result.get('prop',      {})
-        sequencer = app_result.get('sequencer', {})
+        sequencers = app_result.get('sequencers', {})
 
-        jobvar = self.__seq_mgr.sequence(sequencer)
+        jobvar = self.__seq_mgr.sequence(sequencers)
 
         task_data = {}
         task_data['name']       = task_name
@@ -39,7 +39,7 @@ class Create(object):
         task_data['workflow']   = workflow
         task_data['event']      = {}
         task_data['prop']       = prop
-        task_data['sequencer']  = sequencer
+        task_data['sequencers']  = sequencers
         task_data['jobvar']     = jobvar
         task_data['input_file'] = list(app_input.keys())
         task_data['backend']    = backend_data

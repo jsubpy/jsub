@@ -80,6 +80,18 @@ def package(ctx):
     cmd = Package(jsubrc=ctx.obj['jsubrc'])
     cmd.execute()
 
+@cli.command()
+@click.argument('input_list', type=click.Path(exists=True))
+@click.pass_context
+def register(ctx, input_list):
+    from jsub.command.register_to_dfc import RegisterToDFC
+    input_list = click.format_filename(input_list)
+    cmd = RegisterToDFC(jsubrc=ctx.obj['jsubrc'], input_list=input_list)
+    cmd.execute()
+
+
+
+
 
 def main():
     cli(obj={})

@@ -18,7 +18,6 @@ class Jsub(object):
         self.__manager = Manager(jsubrc)
         self.__operation = None
 
-
     def package(self):
         return self.__manager.load_pkg_manager().packages()
 
@@ -32,17 +31,17 @@ class Jsub(object):
         return self.__operation
 
 
-    def rename(self, task, new_name):
+    def rename(self, task_id, new_name):
         op = self.__load_operation()
-        return op.rename(task, new_name)
+        return op.rename(task_id, new_name)
 
     def create(self, task_profile):
         op = self.__load_operation()
         return op.create(task_profile)
 
-    def submit(self, task, sub_ids=None, dry_run=False):
+    def submit(self, task_id, sub_ids=None, dry_run=False):
         op = self.__load_operation()
-        return op.submit(task, sub_ids, dry_run)
+        return op.submit(task_id, sub_ids, dry_run)
 
     def ls(self, task_id=None):
         op = self.__load_operation()

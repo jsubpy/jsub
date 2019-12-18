@@ -57,7 +57,7 @@ class Manager(object):
     def load_ext_manager(self):
         if self.__ext_mgr is None:
             from jsub.manager.extension import ExtensionManager
-            packages = self.load_pkg_manager().packages()
+            packages = self.load_pkg_manager().packages
             self.__ext_mgr = ExtensionManager(packages)
         return self.__ext_mgr
 
@@ -115,9 +115,9 @@ class Manager(object):
         return self.__task_pool
 
     def load_task(self, task):
-        if isinstance(task, int):
+        if isinstance(task, int):	# find by id
             task_pool = self.load_task_pool()
             task_obj = task_pool.find(task)
-        else:
+        else:		
             task_obj = task
         return task_obj

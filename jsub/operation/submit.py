@@ -5,9 +5,9 @@ from jsub.util import safe_mkdir
 from jsub.util import safe_rmdir
 
 class Submit(object):
-    def __init__(self, manager, task, sub_ids=None, dry_run=False):
+    def __init__(self, manager, task_id, sub_ids=None, dry_run=False):
         self.__manager = manager
-        self.__task    = self.__manager.load_task(task)
+        self.__task    = self.__manager.load_task(task_id)
         self.__sub_ids = sub_ids
         self.__dry_run = dry_run
 
@@ -96,6 +96,13 @@ class Submit(object):
     def __submit(self, launcher_param):
         if self.__dry_run:
             return
+
         result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['id'], self.__sub_ids, launcher_param)
 
+        self.__task.data.setdefault('backend_job_id',{})
+        self.__task.data['backend_job_id'].update(result) 
+        task_pool = self.__manager.load_task_pool()
+        task_pool.save(self.__task)
+
         self.__logger.debug(result)
+

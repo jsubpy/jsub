@@ -13,6 +13,7 @@ class FileSystem(object):
     def __init__(self, param):
         self.__repo_dir = os.path.expanduser(param.get('dir', '~/jsub/repo'))
         self.__task_dir = os.path.join(self.__repo_dir, 'task')
+        self.__backend_dir = os.path.join(self.__repo_dir, 'backend')
         self.__id_file  = os.path.join(self.__repo_dir, ID_FILENAME)
 
         self.__logger = logging.getLogger('JSUB')

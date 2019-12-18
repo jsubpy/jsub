@@ -1,5 +1,5 @@
 from jsub.manager.error import SequencerNotSetupError
-
+#translate jobvar_single (from sequencer extension) according to name_map (from task profile)
 def _jobvar_name_map(jobvar_single, name_map):
     jobvar_new = {}
     for k, v in jobvar_single.items():
@@ -36,7 +36,7 @@ class SequencerManager(object):
             jobvar = {}
             try:
                 for sequencer, content in sequencer_content.items():
-                    jobvar_single = content['instance'].next()
+                    jobvar_single = content['instance'].next() 
                     jobvar.update(_jobvar_name_map(jobvar_single, content['name_map']))
             except StopIteration:
                 break
