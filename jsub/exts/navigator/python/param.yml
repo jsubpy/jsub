@@ -1,4 +1,3 @@
-#scenario_format: yaml
-scenario_format: py             #yangyf 20190906
+context_format: py             
 executable: nav.py
 before_delivery: make

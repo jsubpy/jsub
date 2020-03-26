@@ -1,0 +1,45 @@
+name: run_general_script      
+scenario: common     
+backend: dirac  
+
+param:  
+  splitter:    
+    my_sequencer:       
+      type: all_files_in_folder
+#      param: {path: '/junofs/users/yangyf/jsub/examples/test_juno/input_files'} 
+      param: {path: './input_files'} 
+      name_map: {value: input_file} 
+
+
+  input: 
+    common:     
+      first_step.py: first_step.py 
+
+  workflow:
+    download_file_from_dirac:
+      type: dirac_download
+      actvar:
+        input_file_jobvar_name: 'input_file'
+        destination: '../'
+
+    run_script:         
+      type: exe   
+      depend_on: download_file_to_dirac
+      actvar:   
+        exe: first_step.py
+        location: common        
+        accepted_args: 'input_file'
+
+    upload_output:
+      type: dirac_upload
+      depend_on: run_script
+      actvar:
+        source_location: '../'
+        files_to_upload: '*'
+        destination_dir: 'test_juno2'
+        overwrite: 'True'
+        
+
+
+
+

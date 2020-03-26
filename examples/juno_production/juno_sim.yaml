@@ -1,0 +1,31 @@
+name: production_example_1
+scenario: juno
+backend: dirac
+
+param:
+    splitter:
+        mode: default  
+        max_subjobs: 500
+        jobvar_lists:
+            seed:
+                type: range
+                param: {first: 100, step: 1, last: 1000}
+            ekin:
+                type: range
+                param: {first: 0, step: 1, last: 9}
+            
+
+    job_steps: [detsim]
+    JUNO_top: '/cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc494/Pre-Release/J19v1r0-Pre3'
+
+    detsim:
+        max_event: 20000
+        seed: '$(seed)' 
+        output: 'juno_prod/elec_$(ekin).root'  
+        user_output: 'juno_prod/elec_$(ekin)_user.root'
+        additional_args: '--no-gdml  gun --volume pTarget --particles e- --momentums $(ekin) --momentums-interp KineticEnergy'
+            
+
+
+
+

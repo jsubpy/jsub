@@ -6,7 +6,7 @@ from jsub import Jsub
 
 from jsub.config  import load_config_file
 
-JSUB_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+JSUB_COMMAND_DIR = os.path.dirname(os.path.realpath(__file__))
 
 #usage: jsub register <filelist>/<folder_name>
 #	the command would run the dirac-register.sh script, which register the files to DFC; 
@@ -28,7 +28,7 @@ class RegisterToDFC(object):
 			files = [os.path.join(os.path.realpath(self.__input_list),f) for f in os.listdir(self.__input_list) if os.path.isfile(os.path.join(os.path.realpath(self.__input_list),f))]
 
 		for input_file in files:
-			cmd_reg = [os.path.join(JSUB_COMMAND_DIR, 'scripts', 'dirac-register.sh')]
+			cmd_reg = [os.path.join(JSUB_ROOT_DIR, 'scripts', 'dirac-register.sh')]
 			cmd_reg.insert(999,input_file)
 			reg_status=subprocess.call(cmd_reg)
 	

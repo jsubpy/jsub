@@ -1,0 +1,8 @@
+name: simple-task
+
+backend: dirac
+
+app: cepc
+
+param:
+  app_specific_params

@@ -12,7 +12,7 @@ task_sub_id="$1"
 job_root="$2"
 
 navigator_root="${main_root}/navigator"
-scenario_root="${main_root}/scenario"
+context_root="${main_root}/context"
 action_root="${main_root}/action"
 input_root="${main_root}/input"
 
@@ -51,7 +51,7 @@ fi
 logging "Running the navigator: `basename ${navigator}`..."
 
 "${navigator}/${navigator_exe}" "--task_sub_id=${task_sub_id}" \
-    "--main_root=${main_root}" "--scenario_root=${scenario_root}" "--log_root=${log_root}" "--action_root=${action_root}" \
+    "--main_root=${main_root}" "--context_root=${context_root}" "--log_root=${log_root}" "--action_root=${action_root}" \
     "--run_root=${run_root}" "--input_root=${input_root}" "--output_root=${output_root}"
 exit_code=$?
 

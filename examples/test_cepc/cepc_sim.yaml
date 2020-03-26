@@ -1,0 +1,30 @@
+name: cepc_sim_test
+scenario: cepc
+backend: local
+
+param: 
+	splitter:
+		mode: default
+		max_subjobs: 500
+		jobvar_lists:
+			seed:
+				type: range
+				param: {first: 0, step: 1, last: 1000}
+			input_stdhep:
+				type: iter_file_list
+				param: {file_list: '/junofs/users/yangyf/jsub/examples/test_cepc/sim_filelist'}
+#			    param: {folder: '/junofs/users/yangyf/jsub/examples/test_cepc/stdhep_files'}
+							
+
+
+	job_steps: [sim]
+	cepcsoft_version: 0.1.0
+
+	sim:
+		max_event: 100
+		seed: '$(seed)'
+		output_dir: 'cepc_sim/'
+		simu_macro: 'simu.macro'
+		input_stdhep:  '$(input_stdhep)'
+
+

@@ -62,13 +62,13 @@ class Manager(object):
         return self.__ext_mgr
 
 
-    def load_app_manager(self):
-        from jsub.manager.app import AppManager
-        return AppManager(self.load_ext_manager())
+    def load_scenario_manager(self):
+        from jsub.manager.scenario import ScenarioManager
+        return ScenarioManager(self.load_ext_manager())
 
     def load_seq_manager(self):
-        from jsub.manager.sequencer import SequencerManager
-        return SequencerManager(self.load_ext_manager())
+        from jsub.manager.splitter import SplitterManager
+        return SplitterManager(self.load_ext_manager())
 
     def load_backend_manager(self):
         from jsub.manager.backend import BackendManager
@@ -78,9 +78,9 @@ class Manager(object):
         from jsub.manager.bootstrap import BootstrapManager
         return BootstrapManager(self.load_ext_manager())
 
-    def load_scenario_manager(self):
-        from jsub.manager.scenario import ScenarioManager
-        return ScenarioManager()
+    def load_context_manager(self):
+        from jsub.manager.context import ContextManager
+        return ContextManager()
 
     def load_navigator_manager(self):
         from jsub.manager.navigator import NavigatorManager

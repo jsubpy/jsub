@@ -9,11 +9,11 @@ class NavigatorManager(object):
     def __nav_param(self, navigator_type):
         return self.__ext_mgr.ext_config('navigator', navigator_type, 'param')
 
-    def scenario_format(self, navigators):
+    def context_format(self, navigators):
         formats = []
         for navigator_type in navigators:
             nav_param = self.__nav_param(navigator_type)
-            fmt = nav_param.get('scenario_format', ['py'])
+            fmt = nav_param.get('context_format', ['py'])
             formats += fmt if isinstance(fmt, list) else [fmt]
         return formats
 

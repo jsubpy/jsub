@@ -69,7 +69,7 @@ class Jsub(object):
 
     def export(self, task_id, task_sub_id=[], output_dir='.', task_profile_format='yaml'):
         ''' Export job files (task_profile and input) for a task/job
-            User can modify the files and submit again, with a common app
+            User can modify the files and submit again, with a common scenario
         '''
         op = self.__load_operation()
         return op.recreate(task_id=task_id, task_sub_id=task_sub_id, output_dir=output_dir, task_profile_format=task_profile_format)

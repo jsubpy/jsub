@@ -1,0 +1,14 @@
+name: cepc_rec_test
+scenario: cepc
+backend: local
+
+param:
+    cepcsoft_version: 0.1.0
+    job_step: rec
+    rec_steering_file: reco.xml
+    gear_xml_file: /junofs/users/yangyf/CEPC_Test/sim/GearOutput.xml
+    input_dir: /junofs/users/yangyf/jsub_out/sim
+    output_dir:
+        rec: /junofs/users/yangyf/jsub_out/rec
+    seed_start: 10001
+#    event_max: 10

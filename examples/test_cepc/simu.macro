@@ -1,0 +1,18 @@
+/Mokka/init/BatchMode true
+/Mokka/init/printLevel 2
+/Mokka/init/detectorModel CEPC_v4
+
+/Mokka/init/dbHost 202.122.33.149
+/Mokka/init/user consult
+/Mokka/init/dbPasswd consult
+
+/Mokka/init/lcioFilename ../output/nnh_e2e2_sim.slcio
+/Mokka/init/initialMacroFile event.macro
+
+/Mokka/init/lcioDetailedShowerMode true
+/Mokka/init/userInitBool WriteCompleteHepEvt true
+/Mokka/init/lcioWriteMode WRITE_NEW
+/Mokka/init/lcioStoreCalHitPosition true
+/Mokka/init/lcioDetailedTRKHitMode TPCCollection
+
+/Mokka/init/randomSeed 10000000

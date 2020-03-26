@@ -1,0 +1,30 @@
+name: juno_sim_test
+scenario: juno
+backend: dirac
+
+param:
+    splitter:
+        mode: combination   #Cartesian product of jobvar lists
+        max_subjobs: 500
+        jobvar_lists:
+            seed:
+                type: range
+                param: {first: 0, step: 1, last: 1000}
+            energy_point:
+                type: lines_in_file
+                param: {file: '/junofs/users/yangyf/jsub/examples/test_juno/energy_point_list.txt'}
+
+    job_steps: [detsim]
+    JUNO_top: '/cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc494/Pre-Release/J19v1r0-Pre3'
+
+    detsim:
+        max_event: 100
+        seed: '$(seed)' 
+        output: 'tmp/detsim-$(seed).root'  
+        user_output: 'test_juno/$(energy_point)/detsim_$(seed).root'
+        additional_args: '--no-gdml --light-yield 10129 photon --totalphotons 10129'
+            
+
+
+
+

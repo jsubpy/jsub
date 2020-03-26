@@ -5,104 +5,110 @@ from jsub.util import safe_mkdir
 from jsub.util import safe_rmdir
 
 class Submit(object):
-    def __init__(self, manager, task_id, sub_ids=None, dry_run=False):
-        self.__manager = manager
-        self.__task    = self.__manager.load_task(task_id)
-        self.__sub_ids = sub_ids
-        self.__dry_run = dry_run
+	def __init__(self, manager, task_id, sub_ids=None, dry_run=False):
+		self.__manager = manager
+		self.__task	= self.__manager.load_task(task_id)
+		self.__sub_ids = sub_ids
+		self.__dry_run = dry_run
 
-        self.__logger = logging.getLogger('JSUB')
+		self.__logger = logging.getLogger('JSUB')
 
-        if self.__sub_ids is None:
-            self.__sub_ids = list(range(len(self.__task.data['jobvar'])))
+		if self.__sub_ids is None:
+			self.__sub_ids = list(range(len(self.__task.data['jobvar'])))
 
-        self.__initialize_manager()
+		self.__initialize_manager()
 
-    def __initialize_manager(self):
-        self.__config_mgr    = self.__manager.load_config_manager()
+	def __initialize_manager(self):
+		self.__config_mgr	= self.__manager.load_config_manager()
 
-        self.__backend_mgr   = self.__manager.load_backend_manager()
-        self.__bootstrap_mgr = self.__manager.load_bootstrap_manager()
-        self.__navigator_mgr = self.__manager.load_navigator_manager()
-        self.__scenario_mgr  = self.__manager.load_scenario_manager()
-        self.__action_mgr    = self.__manager.load_action_manager()
-        self.__launcher_mgr  = self.__manager.load_launcher_manager()
-
-
-    def handle(self):
-        work_root = self.__backend_mgr.get_work_root(self.__task.data['backend'], self.__task.data['id'])
-
-        main_root = os.path.join(work_root, 'main')
-
-        safe_rmdir(main_root)
-        safe_mkdir(main_root)
-
-        self.__create_input(main_root)
-        self.__create_scenario(main_root)
-        self.__create_action(main_root)
-        self.__create_navigator(main_root)
-        self.__create_bootstrap(main_root)
-
-        launcher_param = self.__create_launcher(work_root)
-
-        self.__submit(launcher_param)
+		self.__backend_mgr   = self.__manager.load_backend_manager()
+		self.__bootstrap_mgr = self.__manager.load_bootstrap_manager()
+		self.__navigator_mgr = self.__manager.load_navigator_manager()
+		self.__context_mgr  = self.__manager.load_context_manager()
+		self.__action_mgr	= self.__manager.load_action_manager()
+		self.__launcher_mgr  = self.__manager.load_launcher_manager()
 
 
-    def __create_input(self, main_root):
-        content = self.__manager.load_content()
-        content.get(self.__task.data['id'], 'input', os.path.join(main_root, 'input'))
+	def handle(self):
+		work_root = self.__backend_mgr.get_work_root(self.__task.data['backend'], self.__task.data['id'])
 
-    def __create_scenario(self, main_root):
-        scenario_dir = os.path.join(main_root, 'scenario')
-        safe_mkdir(scenario_dir)
+		main_root = os.path.join(work_root, 'main')
 
-        action_default = {}
-        for unit, param in self.__task.data['workflow'].items():
-            action_default[unit] = self.__action_mgr.default_config(param['type'])
+		safe_rmdir(main_root)
+		safe_mkdir(main_root)
 
-        navigators = self.__config_mgr.navigator()
-        scenario_format = self.__navigator_mgr.scenario_format(navigators)
+		self.__create_input(main_root)
+		self.__create_context(main_root)
+		self.__create_action(main_root)
+		self.__create_navigator(main_root)
+		self.__create_bootstrap(main_root)
 
-        self.__scenario_mgr.create_scenario_file(self.__task.data, action_default, scenario_format, scenario_dir)
+		launcher_param = self.__create_launcher(work_root)
 
-    def __create_action(self, main_root):
-        action_dir = os.path.join(main_root, 'action')
-        safe_mkdir(action_dir)
-
-        actions = set()
-        for unit, param in self.__task.data['workflow'].items():
-            actions.add(param['type'])
-        self.__action_mgr.create_actions(actions, action_dir)
-
-    def __create_navigator(self, main_root):
-        navigator_dir = os.path.join(main_root, 'navigator')
-        safe_mkdir(navigator_dir)
-
-        navigators = self.__config_mgr.navigator()
-        self.__navigator_mgr.create_navigators(navigators, navigator_dir)
-
-    def __create_bootstrap(self, main_root):
-        bootstrap_dir = os.path.join(main_root, 'bootstrap')
-        safe_mkdir(bootstrap_dir)
-
-        bootstrap = self.__config_mgr.bootstrap()
-        self.__bootstrap_mgr.create_bootstrap(bootstrap, bootstrap_dir)
-
-    def __create_launcher(self, work_root):
-        launcher = self.__task.data['backend']['launcher']
-        return self.__launcher_mgr.create_launcher(launcher, work_root)
+		self.__submit(launcher_param)
 
 
-    def __submit(self, launcher_param):
-        if self.__dry_run:
-            return
+	def __create_input(self, main_root):
+		content = self.__manager.load_content()
+		input_dir = os.path.join(main_root,'input')
+		try:
+			content.get(self.__task.data['id'], 'input', os.path.join(main_root, 'input'))
+		except:
+			safe_mkdir(input_dir)
 
-        result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['id'], self.__sub_ids, launcher_param)
+	def __create_context(self, main_root):
+		context_dir = os.path.join(main_root, 'context')
+		safe_mkdir(context_dir)
 
-        self.__task.data.setdefault('backend_job_id',{})
-        self.__task.data['backend_job_id'].update(result) 
-        task_pool = self.__manager.load_task_pool()
-        task_pool.save(self.__task)
+		action_default = {}
+		for unit, param in self.__task.data['workflow'].items():
+			action_default[unit] = self.__action_mgr.default_config(param['type'])
 
-        self.__logger.debug(result)
+		navigators = self.__config_mgr.navigator()
+		context_format = self.__navigator_mgr.context_format(navigators)
+
+		self.__context_mgr.create_context_file(self.__task.data, action_default, context_format, context_dir)
+
+	def __create_action(self, main_root):
+		action_dir = os.path.join(main_root, 'action')
+		safe_mkdir(action_dir)
+
+		actions = set()
+		for unit, param in self.__task.data['workflow'].items():
+			actions.add(param['type'])
+		self.__action_mgr.create_actions(actions, action_dir)
+
+	def __create_navigator(self, main_root):
+		navigator_dir = os.path.join(main_root, 'navigator')
+		safe_mkdir(navigator_dir)
+
+		navigators = self.__config_mgr.navigator()
+		self.__navigator_mgr.create_navigators(navigators, navigator_dir)
+
+	def __create_bootstrap(self, main_root):
+		bootstrap_dir = os.path.join(main_root, 'bootstrap')
+		safe_mkdir(bootstrap_dir)
+
+		bootstrap = self.__config_mgr.bootstrap()
+		self.__bootstrap_mgr.create_bootstrap(bootstrap, bootstrap_dir)
+
+	def __create_launcher(self, work_root):
+		launcher = self.__task.data['backend']['launcher']
+		return self.__launcher_mgr.create_launcher(launcher, work_root)
+
+
+	def __submit(self, launcher_param):
+		if self.__dry_run:
+			return
+
+		result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['id'], self.__sub_ids, launcher_param)
+		if type(result) != type({}):
+			result = {}
+
+		self.__task.data.setdefault('backend_job_id',{})
+		self.__task.data['backend_job_id'].update(result) 
+		task_pool = self.__manager.load_task_pool()
+		task_pool.save(self.__task)
+
+		self.__logger.debug(result)
 

@@ -1,0 +1,29 @@
+name: juno_sim_test
+scenario: juno
+backend: local
+
+param:
+    splitter:
+        mode: default   #two modes supported: default/combination
+        max_subjobs: 3
+        jobvar_lists:   # parameters that vary in subjobs
+            phi:
+                type: range
+                param: {first: 0, step: 10, last: 360}
+            theta:
+                type: range
+                param: {first: 0, step: 10, last: 180}
+            seed:
+                type: range
+                param: {first: 0, step: 1}
+
+    job_steps: [detsim]
+    JUNO_top: '/cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc494/Pre-Release/J19v1r0-Pre3'
+
+    detsim:
+        max_event: 10
+        seed: '$(seed)'
+        output: '/tmp/detsim-$(seed).root'
+        user_output: '/cefs/dirac/user/y/yyang/juno/test_juno_sim/$(phi)_$(theta)_$(seed).root'
+        additional_args: '--no-gdml --light-yield 10129 photon --totalphotons 10129'
+            

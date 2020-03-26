@@ -64,7 +64,7 @@ add_stream_logger()
 # Parse arguments
 
 class ArgParser:
-    sub_roots = ['scenario', 'log', 'action', 'run', 'input', 'output']
+    sub_roots = ['context', 'log', 'action', 'run', 'input', 'output']
 
     def __init__(self, argv):
         self.validation = False
@@ -93,32 +93,32 @@ class ArgParser:
             if option_sub_root not in self.options:
                 self.options[option_sub_root] = os.path.join(self.options['main_root'], sub_root)
 
-        self.options['scenario_file'] = os.path.join(self.options['scenario_root'], 'scenario.py')
+        self.options['context_file'] = os.path.join(self.options['context_root'], 'context.py')
 
-    def read_scenario(self):
-        scenario = {}
+    def read_context(self):
+        context = {}
 
-        jsub_logger.debug('Reading scenario from file: %s', self.options['scenario_file'])
-        f = open(self.options['scenario_file'], 'r')
+        jsub_logger.debug('Reading context from file: %s', self.options['context_file'])
+        f = open(self.options['context_file'], 'r')
         try:
-            scenario = eval(f.read())
+            context = eval(f.read())
         finally:
             f.close()
 
-        scenario['general']['task_sub_id'] = self.options['task_sub_id']
-        scenario['general']['main_root'] = self.options['main_root']
+        context['general']['task_sub_id'] = self.options['task_sub_id']
+        context['general']['main_root'] = self.options['main_root']
 
         for sub_root in self.sub_roots:
             option_sub_root = sub_root + '_root'
-            scenario['general'][option_sub_root] = self.options[option_sub_root]
+            context['general'][option_sub_root] = self.options[option_sub_root]
 
-        scenario['general']['log_unit_root'] = os.path.join(self.options['log_root'], 'unit')
-        mkdir_safe(scenario['general']['log_unit_root'])
+        context['general']['log_unit_root'] = os.path.join(self.options['log_root'], 'unit')
+        mkdir_safe(context['general']['log_unit_root'])
 
-        scenario['general']['input_common_dir'] = os.path.join(self.options['input_root'], 'common')
-        scenario['general']['input_unit_root']  = os.path.join(self.options['input_root'], 'unit')
+        context['general']['input_common_dir'] = os.path.join(self.options['input_root'], 'common')
+        context['general']['input_unit_root']  = os.path.join(self.options['input_root'], 'unit')
 
-        return scenario
+        return context
 
 
 ################################################################################
@@ -274,14 +274,14 @@ class UnitThread(threading.Thread):
 
 
 class UnitRunner:
-    def __init__(self, scenario_general):
-        self.__scenario_general = scenario_general
+    def __init__(self, context_general):
+        self.__context_general = context_general
         self.__unit_threads = {}
         self.__queue_unit = Queue()
 
     def __args_basic(self, unit, action_type, executable):
         args = []
-        args.append(os.path.join(self.__scenario_general['action_root'], action_type, executable))
+        args.append(os.path.join(self.__context_general['action_root'], action_type, executable))
         return args
 
     def __var_2_env(self, var):
@@ -454,36 +454,36 @@ class TaskSubIdNotFoundError(Exception):
 
 
 class Navigator:
-    def __init__(self, scenario):
-        self.__scenario_general  = scenario['general']
+    def __init__(self, context):
+        self.__context_general  = context['general']
 
-        task_sub_id = self.__scenario_general['task_sub_id']
-        all_jobvar = scenario['jobvar']
+        task_sub_id = self.__context_general['task_sub_id']
+        all_jobvar = context['jobvar']
         if task_sub_id not in all_jobvar:
             raise TaskSubIdNotFoundError('Task sub ID not found: %s', task_sub_id)
-        self.__scenario_jobvar   = all_jobvar[task_sub_id]
+        self.__context_jobvar   = all_jobvar[task_sub_id]
 
-        self.__scenario_workflow = scenario['workflow']
-        self.__scenario_event    = scenario['event']
+        self.__context_workflow = context['workflow']
+        self.__context_event    = context['event']
 
         self.__data_workflow = {}
-        for unit in self.__scenario_workflow:
+        for unit in self.__context_workflow:
             self.__data_workflow[unit] = {}
             self.__data_workflow[unit]['sysvar'] = self.__init_sysvar(unit)
-            self.__data_workflow[unit]['jobvar'] = self.__scenario_jobvar
-            self.__data_workflow[unit]['actvar'] = self.__scenario_workflow[unit]['actvar']
+            self.__data_workflow[unit]['jobvar'] = self.__context_jobvar
+            self.__data_workflow[unit]['actvar'] = self.__context_workflow[unit]['actvar']
             self.__data_workflow[unit]['depvar'] = {}
-            self.__data_workflow[unit]['type'] = self.__scenario_workflow[unit]['type']
-            self.__data_workflow[unit]['param'] = self.__scenario_workflow[unit]['param']
+            self.__data_workflow[unit]['type'] = self.__context_workflow[unit]['type']
+            self.__data_workflow[unit]['param'] = self.__context_workflow[unit]['param']
 
-        self.__unit_runner = UnitRunner(self.__scenario_general)
+        self.__unit_runner = UnitRunner(self.__context_general)
 
     def __init_sysvar(self, unit):
-        sysvar = self.__scenario_general.copy()
+        sysvar = self.__context_general.copy()
         sysvar['unit'] = unit
-        sysvar['log_dir'] = os.path.join(self.__scenario_general['log_unit_root'], unit)
-        sysvar['run_dir'] = os.path.join(self.__scenario_general['run_root'], unit)
-        sysvar['input_dir'] = os.path.join(self.__scenario_general['input_unit_root'], unit)
+        sysvar['log_dir'] = os.path.join(self.__context_general['log_unit_root'], unit)
+        sysvar['run_dir'] = os.path.join(self.__context_general['run_root'], unit)
+        sysvar['input_dir'] = os.path.join(self.__context_general['input_unit_root'], unit)
         return sysvar
 
 
@@ -493,10 +493,10 @@ class Navigator:
 
     def generate_dag(self):
         dag = Dag()
-        for unit in self.__scenario_workflow:
+        for unit in self.__context_workflow:
             dag.add_vertex(unit)
-        for unit, scenario_unit in self.__scenario_workflow.items():
-            for unit_from in scenario_unit.get('depend_on', []):
+        for unit, context_unit in self.__context_workflow.items():
+            for unit_from in context_unit.get('depend_on', []):
                 jsub_logger.debug('Add direction for DAG: %s -> %s', unit_from, unit)
                 dag.add_edge(unit_from, unit)
         self.__dag_workflow = dag
@@ -552,10 +552,10 @@ def main():
         add_file_logger(options['log_root'])
         jsub_logger.debug('Parse arguments to options: %s', options)
 
-        scenario = arg_parser.read_scenario()
-        jsub_logger.debug('Read scenario: %s', scenario)
+        context = arg_parser.read_context()
+        jsub_logger.debug('Read context: %s', context)
 
-        nav = Navigator(scenario)
+        nav = Navigator(context)
         nav.run()
     except Exception:
         e = sys.exc_info()

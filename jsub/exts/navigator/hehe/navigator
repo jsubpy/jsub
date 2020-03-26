@@ -1,5 +1,0 @@
-#!/usr/bin/env fsda
-
-puts 'hehe'
-
-exit(0)

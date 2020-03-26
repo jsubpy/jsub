@@ -57,13 +57,13 @@ class ConfigManager(object):
     def task_name(self, task_profile):
         if 'name' in task_profile:
             return task_profile['name']
-        return task_profile['app']
+        return task_profile['scenario']
 
 
-    def app_data(self, task_profile):
-        app_type = task_profile.get('app', 'common')
-        app_param = task_profile.get('param', {})
-        return {'type': app_type, 'param': app_param}
+    def scenario_data(self, task_profile):
+        scenario_type = task_profile.get('scenario', 'common')
+        scenario_param = task_profile.get('param', {})
+        return {'type': scenario_type, 'param': scenario_param}
 
 
     def backend_data(self, task_profile):

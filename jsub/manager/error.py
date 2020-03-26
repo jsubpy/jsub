@@ -19,10 +19,10 @@ class RepoNotSetupError(ExtensionNotSetupError):
 class ContentNotSetupError(ExtensionNotSetupError):
     pass
 
-class AppNotSetupError(ExtensionNotSetupError):
+class ScenarioNotSetupError(ExtensionNotSetupError):
     pass
 
-class SequencerNotSetupError(ExtensionNotSetupError):
+class JobvarListNotSetupError(ExtensionNotSetupError):
     pass
 
 class BackendNotSetupError(ExtensionNotSetupError):

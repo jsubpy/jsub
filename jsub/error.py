@@ -2,10 +2,10 @@ class JsubError(Exception):
     pass
 
 
-class SequencerError(JsubError):
+class SplitterError(JsubError):
     pass
 
-class SequencerParamError(SequencerError):
+class SplitterParamError(SplitterError):
     pass
 
 

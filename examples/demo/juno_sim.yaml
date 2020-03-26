@@ -1,0 +1,27 @@
+name: juno_sim_test
+scenario: juno
+backend: dirac
+
+param:
+    splitter:
+        mode: combination
+        max_subjobs: 5
+        jobvar_lists:
+            seed:
+                type: range
+                param: {first: 0, step: 1}
+            global_positions:
+                type: lines_in_file
+                param: {file: '/junofs/users/yangyf/jsub/examples/test_juno/detsim_global_position.txt'}
+
+    job_steps: [detsim]
+    JUNO_top: '/cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc494/Pre-Release/J19v1r0-Pre3'
+
+    detsim:
+        max_event: 10
+        seed: '$(seed)'
+        output: 'tmp/detsim-$(seed).root'  #under user's home dir in /cefs
+        user_output: 'juno/test_juno_sim/$(phi)_$(theta)_$(seed).root'
+        additional_args: '--no-gdml --light-yield 10129 photon --totalphotons 10129'
+            
+

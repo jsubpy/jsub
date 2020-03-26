@@ -8,7 +8,7 @@ from jsub import Jsub
 COLUMN_TITLE = {
     'id':         'Task ID',
     'name':       'Name',
-    'app':        'Application',
+    'scenario':        'Scenariolication',
     'backend':    'Backend',
     'status':     'Status',
     'created_at': 'Creation Time (UTC)',
@@ -24,7 +24,7 @@ def _convert_table_data(tasks_data, columns):
                 line_data.append('N/A')
                 continue
 
-            if col in ['app', 'backend']:
+            if col in ['scenario', 'backend']:
                 if 'type' in task_data[col]:
                     line_data.append(task_data[col]['type'])
                 else:
@@ -83,7 +83,7 @@ class Ls(object):
         j = Jsub(self.__jsubrc)
         tasks_data = j.ls(self.__task_ids)
 
-        columns = ['id', 'name', 'app', 'backend', 'status', 'created_at']
+        columns = ['id', 'name', 'scenario', 'backend', 'status', 'created_at']
 
         table_data = _convert_table_data(tasks_data, columns)
         _print_table(table_data, columns)
