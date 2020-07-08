@@ -39,9 +39,9 @@ class Local(Common):
 		self.initialize_common_param()
 
 	def property(self):
-		return {'run_on': 'local'}
+		return {'run_on': 'local', 'name': 'local'}
 
-	def submit(self, task_id, sub_ids, launcher_param):
+	def submit(self, task_id, launcher_param,  sub_ids=None):
 		launcher_exe = launcher_param['executable']
 
 		processes = {}
@@ -49,11 +49,11 @@ class Local(Common):
 		count = 0
 		for sub_id in sub_ids:
 			if count >= self._max_submit:
-				print("Exceeding max submit (%d subjobs)"%self._max_submit)
+				print("Exceeding max submit on local backend. (%d subjobs)"%self._max_submit)
 				break
 
 			try:
-				launcher = os.path.join(self.get_work_root(task_id), launcher_exe)
+				launcher = os.path.join(self.get_run_root(task_id), launcher_exe)
 
 				FNULL = open(os.devnull, 'w')
 				process = subprocess.Popen([launcher, str(sub_id)], stdout=FNULL, stderr=subprocess.STDOUT)

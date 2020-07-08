@@ -1,0 +1,33 @@
+Metadata-Version: 1.1
+Name: jsub
+Version: 0.1.0.dev2
+Summary: Job submission utility bundle
+Home-page: https://jsubpy.github.io/
+Author: Xianghu Zhao
+Author-email: zhaoxh@ihep.ac.cn
+License: MIT
+Description: JSUB
+        ====
+        
+        .. image:: https://img.shields.io/pypi/v/jsub.svg
+           :target: https://pypi.python.org/pypi/jsub
+           :alt: PyPI
+        
+        .. image:: https://codeclimate.com/github/jsubpy/jsub/badges/gpa.svg
+           :target: https://codeclimate.com/github/jsubpy/jsub
+           :alt: Code Climate
+        
+Keywords: Job submission tools
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: System :: Distributed Computing
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6

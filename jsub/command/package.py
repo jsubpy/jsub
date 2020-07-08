@@ -7,7 +7,7 @@ class Package(object):
         self.__jsubrc = jsubrc
 
     def execute(self):
-        click.echo('Package...')
+        click.echo('Current active packages:')
 
         j = Jsub(self.__jsubrc)
         for pack in j.package():

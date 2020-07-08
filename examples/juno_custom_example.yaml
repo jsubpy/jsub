@@ -1,0 +1,29 @@
+# a JUNO example that generate custom jobs with predefined random seeds and output filenames
+taskName: juno_custom_example
+backend: dirac
+
+experiment: juno
+#softVersion: 'J19v1r0-Pre3' 
+
+splitter:
+    mode: splitByJobvars
+    jobvar_lists:
+        detsim_output:
+            type: lines_in_file
+            file: './custom_example/filenames'
+        seed:
+            type: lines_in_file
+            file: './custom_example/seeds'
+            
+
+outputSubDir: ''
+evtMax: 100
+
+workflow:
+    steps: [detsim, elecsim]
+
+    detsim:
+        seed: '$(seed)'
+        output: '$(detsim_output)'
+        user_output: '$(detsim_output).user'
+        particles: 'e-'

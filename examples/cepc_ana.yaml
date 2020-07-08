@@ -1,0 +1,34 @@
+name: cepc_ana_dummy
+backend: local
+
+experiment: cepc
+softVersion: '0.1.0'
+
+jobGroup: cepc_ana
+
+inputBox:
+    - Gear.xml
+    - ./lib/libvvHmumu.so
+
+outputDir: '/cefs/dirac/user/y/yyang/cepc_prod/'
+
+splitter:
+    mode: splitByInputFiles
+    fileList: './input/ana_input_slcio.txt'
+    filesPerSubjob: 5
+    maxSubjobs: 100
+    inputTo: cepcAlg.inputSlcio
+
+
+
+workflow:
+    cepcAlg:
+        algName: 'vvHmumu'
+        gearXMLFile: Gear.xml
+        #use steering file template and replace attributes    
+        #   - inputSlcio
+        #   - outputFilename: algName-conten1-content2-subjobID-{PerJob_ID}.root
+        #   - algName 
+
+
+

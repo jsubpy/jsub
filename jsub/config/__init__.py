@@ -47,6 +47,7 @@ def load_config_string(s, fmt=''):
 def load_config_file(fn, fmt=''):
     with open(fn, 'r') as f:
         file_content = f.read()
+        file_content = file_content.replace('\t','    ')    # allow \t in yaml
 
     if fmt:
         config_format = fmt

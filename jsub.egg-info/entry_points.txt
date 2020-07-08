@@ -1,0 +1,3 @@
+[console_scripts]
+jsub = jsub.command:main
+

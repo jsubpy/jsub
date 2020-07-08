@@ -1,0 +1,48 @@
+taskName: juno_simrec_jobvar_splitter_test
+backend: dirac
+
+experiment: juno
+softVersion: 'J19v1r0-Pre3' 
+
+splitter:
+	mode: splitByJobvars
+	maxSubjobs: 50
+    evtMaxPerJob: 100
+    # jobvars are combined according to groups
+    # in this case: 5/7 jobvars in group a, 3 in group b, 2 in group c -> 30 subjobs, each with a unique seed
+	jobvar_lists:
+        seed:
+            type: range
+            first: 1
+        px:
+            type: range
+            first: 100
+            group: a
+            last: 104
+        py: 
+            type: range
+            group: a
+            first: 200
+            last: 206
+        pz:
+            type: range
+            group: c
+            first: 1
+            last: 2
+        momentum:
+            type: range
+            group: b
+            first: 3
+            last: 5
+        
+outputSubDir: 'juno_prod'
+
+step:	
+    steps: [detsim]
+
+    detsim:
+        seed: '$(seed)'
+        particles: e+
+        additional_args: 'gun --positions $(px) $(py) $(pz) --momentums $(momentum)'
+
+   

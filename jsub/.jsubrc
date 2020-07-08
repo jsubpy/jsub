@@ -1,0 +1,53 @@
+#log_level: DEBUG
+log_level: INFO
+time_zone: utc
+
+package: [jsub.exts]
+
+max_jobs_per_task: 100000
+list_tasks_recent_days: 60
+
+
+taskDir:
+  location: ~/jsub/
+  # Storage of raw task files
+  content:
+    type: file_system
+  # Digested task info for the software
+  repo:
+    type: file_system
+    format: compact
+
+### Settings on JSUB driver scripts
+bootstrap: shell
+navigator:
+  - python
+
+### Backend Setting
+backend:
+  default: dirac
+
+  local:
+    type: local
+    launcher: arg
+  fg:
+    type: local
+    launcher: arg
+    param:
+      foreground: True
+#  condor:
+#    type: condor
+#    launcher: arg
+#    param:
+#      work_dir: ~/jsub/work
+  dirac:
+    type: dirac
+  ### Relevant JSUB driver script
+    launcher: dirac
+#    param:
+#      site:
+#        - CLOUD.IHEP.cn
+#        - GRID.JINR.ru
+#        - CLUSTER.USTC.cn
+
+

@@ -9,7 +9,7 @@ class Rename(object):
         self.__new_name = new_name
 
     def execute(self):
-        click.echo('Rename...')
+        click.echo('Rename task %s to new name.'%self.__task_id)
 
         j = Jsub(self.__jsubrc)
         j.rename(self.__task_id, self.__new_name)

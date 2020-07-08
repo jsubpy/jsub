@@ -1,7 +1,0 @@
-the 3rd text file
-apple
-banana
-cat
-donkey
-egg
-fly

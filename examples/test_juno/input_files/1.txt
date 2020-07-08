@@ -1,4 +1,0 @@
-this is a text file,
-with some strings.
-the 3rd line
-the 4th line

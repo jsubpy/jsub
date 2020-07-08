@@ -1,95 +1,162 @@
-from jsub.config        import load_config_file
+from jsub.config		import load_config_file
 from jsub.manager.error import BackendNotSetupError
+import os
+from jsub.util import deep_update
+import collections, sys
+import copy
+
+JSUB_MAIN_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)),'../')
 
 
 class ConfigManager(object):
-    default_settings = {
-        'log_level': 'INFO',
-        'work_dir': '~/jsub/work',
-        'max_cycle': 10000,
-    }
+	default_settings = {
+		'log_level': 'INFO',
+		'runDir': '~/jsub/run',
+		'max_cycle': 10000,
+	}
 
-    def __init__(self, schema_mgr, jsubrc):
-        self.__schema_mgr = schema_mgr
-        self.__config_jsubrc = self.__schema_mgr.validate_jsubrc_config(load_config_file(jsubrc))
-        self.__config = self.__config_jsubrc
+	def __init__(self, schema_mgr, jsubrc):
+		self.__schema_mgr = schema_mgr
+		# use .jsubrc in JSUB main dir for default configuration
+		config_jsubrc = self.__schema_mgr.validate_jsubrc_config(load_config_file(os.path.join(JSUB_MAIN_DIR,'.jsubrc')))
+		# and deep-update with user's configuration
+		config_user_jsubrc = self.__schema_mgr.validate_jsubrc_config(load_config_file(jsubrc))
+		deep_update(config_jsubrc,config_user_jsubrc)
+		self.__config_jsubrc = config_jsubrc
+		self.__config = self.__config_jsubrc
 
-    def config_jsubrc(self, item):
-        if item in self.__config_jsubrc:
-            return self.__config_jsubrc[item]
-        if item in default_settings:
-            return default_settings[item]
-        raise ConfigNotSetupError('Configuration not found for: %s' % item)
+	def config_jsubrc(self, item):
+		if item in self.__config_jsubrc:
+			return self.__config_jsubrc[item]
+		if item in default_settings:
+			return default_settings[item]
+		raise ConfigNotSetupError('Configuration not found for: %s' % item)
 
-    def config(self, item):
-        return self.config_jsubrc(item)
+	def config(self, item):
+		return self.config_jsubrc(item)
 
-    def merge_packages_config(self, packages_config):
-        pass
+	def merge_packages_config(self, packages_config):
+		pass
 
-    def repo(self):
-        if 'repo' in self.__config:
-            return self.__config['repo']
-        config_repo = {}
-        config_repo['type'] = 'file_system'
-        config_repo['param'] = {'dir': '~/jsub/repo', 'format': 'compact'}
-        return config_repo
+	def repo(self): #task data repository
+		config_repo = {}			
+		config_repo['type'] = 'file_system'
+		config_repo['param'] = {'dir': '~/jsub/task_info/', 'format': 'compact'}
 
-    def content(self):
-        if 'content' in self.__config:
-            return self.__config['content']
-        config_content = {}
-        config_content['type'] = 'file_system'
-        config_content['param'] = {'dir': '~/jsub/content'}
-        return config_content
+		if 'taskDir' in self.__config:
+			taskDir=self.__config['taskDir'].get('location','~/jsub/')
+			repo_dir=os.path.join(taskDir,'task_info/')
 
-    def bootstrap(self):
-        if 'bootstrap' in self.__config:
-            return self.__config['bootstrap']
-        return 'shell'
+			if 'repo' in self.__config['taskDir']:
+				config_repo['param']=self.__config['taskDir']['repo']				
+				config_repo['type']=self.__config['taskDir']['repo'].get('type','file_system')
 
-    def navigator(self):
-        if 'navigator' in self.__config:
-            return self.__config['navigator']
-        return ['python']
+			config_repo['param']['dir']=repo_dir
+
+		return config_repo
+
+	def content(self): #raw task data
+		config_content = {}
+		config_content['type'] = 'file_system'
+		config_content['param'] = {'dir': '~/jsub/task_info/'}
+
+		if 'taskDir' in self.__config:
+			taskDir=self.__config['taskDir'].get('location','~/jsub/')
+			content_dir=os.path.join(taskDir,'task_info/')
+
+			if 'content' in self.__config['taskDir']:
+				config_content['param']=self.__config['taskDir']['content']				
+				config_content['type']=self.__config['taskDir']['content'].get('type','file_system')				
+
+			config_content['param']['dir']=content_dir
+		return config_content
+
+	def bootstrap(self):
+		if 'bootstrap' in self.__config:
+			return self.__config['bootstrap']
+		return 'shell'
+
+	def navigator(self):
+		if 'navigator' in self.__config:
+			return self.__config['navigator']
+		return ['python']
 
 
-    def task_name(self, task_profile):
-        if 'name' in task_profile:
-            return task_profile['name']
-        return task_profile['scenario']
+	def task_name(self, task_profile):
+		name=task_profile.get('experiment')
+		name=task_profile.get('scenario',name)
+		name=task_profile.get('name',name)
+		name=task_profile.get('taskName',name)
+		return name
 
 
-    def scenario_data(self, task_profile):
-        scenario_type = task_profile.get('scenario', 'common')
-        scenario_param = task_profile.get('param', {})
-        return {'type': scenario_type, 'param': scenario_param}
+	def scenario_data(self, task_profile):
+		# users may specify scenario_type with scenario/experiment tag
+		scenario_type = task_profile.get('scenario', 'common')
+		scenario_type = task_profile.get('experiment', scenario_type)
+		# users may put attributes inside or outside param block
+		scenario_param = copy.deepcopy(task_profile)
+		try:
+			scenario_param.pop('param')
+		except:
+			pass
+		scenario_param.update(task_profile.get('param', {}))
+		return {'type': scenario_type, 'param': scenario_param}
 
 
-    def backend_data(self, task_profile):
-        if 'backend' not in task_profile:
-            try:
-                backend_name = self.__config['backend']['default']
-            except KeyError:
-                raise BackendNotSetupError('Must specify a backend')
-        else:
-            backend_in_profile = task_profile['backend']
-            if isinstance(backend_in_profile, str):
-                backend_name = backend_in_profile
-#            elif isinstance(backend_in_profile, dict):
-#                if 'type' not in backend_value:
-#                    raise BackendNotSetupError('Must specify the backend type')
-#                backend_type = backend_value['type']
-#                backend_param_profile = backend_value['param']
-            else:
-                raise BackendNotSetupError('Backend value format not correct')
+	def backend_data(self, task_profile):
+		backend_param_profile={}
+		if 'backend' not in task_profile:
+			try:
+				backend_name = self.__config['backend']['default']
+			except KeyError:
+				raise BackendNotSetupError('Must specify a backend')
+		else:
+			backend_in_profile = task_profile['backend']
+			if isinstance(backend_in_profile, str):
+				backend_name = backend_in_profile
+				backend_in_profile = {'type':backend_name}
+			elif isinstance(backend_in_profile, dict):
+				if 'type' not in backend_in_profile:
+					raise BackendNotSetupError('Must specify the backend type')
+				backend_name = backend_in_profile['type']
+				backend_param_profile = backend_in_profile.get('param',{})
+			else:
+				raise BackendNotSetupError('Backend value format not correct')
 
-        backend_type = self.__config.get('backend', {}).get('predefined').get(backend_name, {}).get('type')
-        backend_launcher = self.__config.get('backend', {}).get('predefined').get(backend_name, {}).get('launcher')
-        backend_param = self.__config.get('backend', {}).get('predefined').get(backend_name, {}).get('param', {})
-#        backend_param.update(backend_param_profile)
+		# Load backend setting from jsubrc
+		backend_type = self.__config.get('backend', {}).get(backend_name, {}).get('type', backend_name)
+		backend_launcher = self.__config.get('backend', {}).get(backend_name, {}).get('launcher', 'arg')
+		backend_param = self.__config.get('backend', {}).get(backend_name, {}).get('param', {})
+		# in jsubrc: load attributes outside param block
+		backend_o = self.__config.get('backend',{}).get(backend_name,{})	
+		backend_oparam = copy.deepcopy(backend_o)
+		try:
+			backend_oparam.pop('param')
+		except:
+			pass
+		backend_param.update(backend_oparam)
 
-        if 'work_dir' not in backend_param:
-            backend_param['work_dir'] = self.__config['backend'].get('work_dir', '~/jsub/work')
+		# users may put attributes inside or outside param block
+		backend_param_po = copy.deepcopy(backend_in_profile)
+		try:
+			backend_param_po.pop('param')
+		except:
+			pass
+		backend_param_profile.update(backend_param_po)
+	
+		# try overloading setting from task profile
+		backend_param.update(backend_param_profile)
 
-        return {'type': backend_type, 'launcher': backend_launcher, 'param': backend_param}
+		if 'runDir' not in backend_param:
+			if 'taskDir' in self.__config:
+				taskDir=self.__config['taskDir'].get('location','~/jsub/')
+				backend_param['runDir']=os.path.join(taskDir,'run')
+			else:
+				backend_param['runDir'] = self.__config['backend'].get('runDir', '~/jsub/run')
+
+		if 'jobName' not in backend_param:
+			backend_param['jobName']=task_profile.get('taskName','')
+			
+
+		return {'type': backend_type, 'launcher': backend_launcher, 'param': backend_param}

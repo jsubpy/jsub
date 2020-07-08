@@ -1,0 +1,35 @@
+taskName: cepc_simrec_dummy
+backend: dirac
+
+experiment: cepc
+softVersion: '0.1.0'
+
+jobGroup: cepc_simrec
+
+splitter:
+    mode: splitByInputFiles
+    fileList: './input/stdhep_filelist' # a text file that content the list of file names
+#   inputLFN:  
+#       - '/cefs/dirac/user/y/yyang/cepc_prod/input_stdheps/*' 
+#       - '/cefs/dirac/user/y/yyang/cepc_prod/input_stdheps_2/*stdhep'
+    #metadata:
+    #    tag1: 'content_tag1'
+    #    tag2: 'content_tag2'
+
+    filesPerSubjob: 5
+    maxSubjobs: 100    #only submit the first 100 jobs
+    inputTo: cepcSim.inputStdhepFile
+
+outputDir: '/cefs/dirac/user/y/yyang/cepc_prod/'    #general setting
+workflow:
+    cepcSim:
+        simMacro: './simu.macro'
+        maxEvent: 100
+
+        outputDir: '/cefs/dirac/user/y/yyang/cepc_prod/sim/'    
+            #overridding general setting
+
+    cepcRec:
+        steeringFile: 'reco.xml'
+        gearXmlFile: '/junofs/users/yangyf/CEPC_Test/sim/GearOutput.xml'    
+            #when not specified, input from cepcSim; raise error if cepcSim doesn't exist

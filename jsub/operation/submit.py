@@ -5,16 +5,16 @@ from jsub.util import safe_mkdir
 from jsub.util import safe_rmdir
 
 class Submit(object):
-	def __init__(self, manager, task_id, sub_ids=None, dry_run=False):
+	def __init__(self, manager, task_id, sub_ids=None, dry_run=False, resubmit=False):
 		self.__manager = manager
 		self.__task	= self.__manager.load_task(task_id)
 		self.__sub_ids = sub_ids
 		self.__dry_run = dry_run
+		self.__resubmit = resubmit
 
 		self.__logger = logging.getLogger('JSUB')
-
-		if self.__sub_ids is None:
-			self.__sub_ids = list(range(len(self.__task.data['jobvar'])))
+		if self.__sub_ids==None:
+			self.__sub_ids=range(len(self.__task.data['jobvar']))
 
 		self.__initialize_manager()
 
@@ -30,9 +30,9 @@ class Submit(object):
 
 
 	def handle(self):
-		work_root = self.__backend_mgr.get_work_root(self.__task.data['backend'], self.__task.data['id'])
+		run_root = self.__backend_mgr.get_run_root(self.__task.data['backend'], self.__task.data['id'])
 
-		main_root = os.path.join(work_root, 'main')
+		main_root = os.path.join(run_root, 'main')
 
 		safe_rmdir(main_root)
 		safe_mkdir(main_root)
@@ -43,7 +43,7 @@ class Submit(object):
 		self.__create_navigator(main_root)
 		self.__create_bootstrap(main_root)
 
-		launcher_param = self.__create_launcher(work_root)
+		launcher_param = self.__create_launcher(run_root)
 
 		self.__submit(launcher_param)
 
@@ -92,21 +92,44 @@ class Submit(object):
 		bootstrap = self.__config_mgr.bootstrap()
 		self.__bootstrap_mgr.create_bootstrap(bootstrap, bootstrap_dir)
 
-	def __create_launcher(self, work_root):
+	def __create_launcher(self, run_root):
 		launcher = self.__task.data['backend']['launcher']
-		return self.__launcher_mgr.create_launcher(launcher, work_root)
+		return self.__launcher_mgr.create_launcher(launcher, run_root)
 
 
 	def __submit(self, launcher_param):
 		if self.__dry_run:
 			return
 
-		result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['id'], self.__sub_ids, launcher_param)
-		if type(result) != type({}):
+		if self.__resubmit==False:
+			if self.__task.data.get('backend_job_ids') or self.__task.data.get('backend_task_id'):
+				self.__logger.info('This task has already been submitted to backend, rerun the command with "-r" option if you wish to delete current jobs and resubmit the task.') 
+				return
+		else:	
+			task_id = self.__task.data.get('backend_task_id')
+			job_ids = self.__task.data.get('backend_job_ids')
+			if task_id:
+				self.__backend_mgr.delete_task(self.__task.data['backend'],backend_task_id = task_id)
+			elif job_ids:
+				self.__backend_mgr.delete_jobs(self.__task.data['backend'],backend_job_ids = job_ids)
+
+		result = self.__backend_mgr.submit(self.__task.data['backend'], self.__task.data['id'], launcher_param, sub_ids = self.__sub_ids)
+		if not type(result) is  dict:
 			result = {}
 
-		self.__task.data.setdefault('backend_job_id',{})
-		self.__task.data['backend_job_id'].update(result) 
+		if 'backend_job_ids' in result:
+			njobs = len(result['backend_job_ids'])
+		else:
+			njobs = len(result)
+		if njobs>0:
+			self.__logger.info('%d jobs successfully submitted to backend.'%(njobs))
+
+		self.__task.data.setdefault('backend_job_ids',{})
+		backend_job_ids=result.get('backend_job_ids',{})
+		backend_task_id=result.get('backend_task_id',0)
+		self.__task.data['backend_job_ids'].update(backend_job_ids) 
+		self.__task.data['backend_task_id']=backend_task_id
+		self.__task.data['status'] = 'Submitted'
 		task_pool = self.__manager.load_task_pool()
 		task_pool.save(self.__task)
 

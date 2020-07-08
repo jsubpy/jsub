@@ -5,6 +5,7 @@ if [ $# != 1 ]; then
     exit 1
 fi
 
+
 task_sub_id="$1"
 
 cd $(dirname "$0")
@@ -22,3 +23,7 @@ launcher_log="${log_root}/launcher.log"
 bootstrap_exe=$(cat "${work_root}/main/bootstrap/executable")
 
 "${work_root}/main/bootstrap/${bootstrap_exe}" "${task_sub_id}" "${job_root}" > "${launcher_log}" 2>&1
+
+exit_code=$?
+
+return exit_code

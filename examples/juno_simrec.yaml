@@ -1,0 +1,36 @@
+# A basic juno example
+taskName: juno_simrec
+backend: 
+    type: dirac
+    # The final directory for output file would be: /<cefs-user-home>/<outputSubDir>/<taskName>
+    # The sub-directory relative to the root directory is defined here
+    outputSubDir: 'juno_prod/'
+#   site:
+#       - CLOUD.ihep.cn
+
+experiment: juno
+softVersion: 'J19v1r0-Pre3'
+
+splitter:
+    mode: splitByEvent
+    # evtmax can be set here or in general setting
+    evtMaxPerJob: 10  
+    njobs: 5
+#   totalEvents: 2000      
+    # if njobs is not specified, would use this attribute to determine number of subjobs instead
+
+
+workflow:
+    steps: [detsim, elecsim, calib, rec]
+
+    detsim: 
+        seed: 5
+        particles: e+
+        momentums: 1.398    #MeV
+        additionalArgs: '--nogdml --light-yield 10129 photon --totalphotons 10129'
+
+
+            
+    
+    
+        

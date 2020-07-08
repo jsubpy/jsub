@@ -1,65 +1,34 @@
-#log_level: DEBUG
-log_level: INFO
-time_zone: utc
+# JSUB Configuration File
+# This configuration file is supposed to be put at ~/.jsubrc.
+# The settings here would overload the default ones defined in .jsubrc in JSUB main dir.
+#==================================================================================
 
-package: [jsub_cepc, jsub_dirac, jsub.exts]
+###    The packages to be loaded to JSUB. JSUB would search for extension modules according to the order given here.
+package: [jsub_juno, jsub_cepc, jsub_dirac, jsub.exts]
 
-max_jobs_per_task: 100000
-list_tasks_recent_days: 60
+### Location to put task information files; may need big space for log and output files
+taskDir: 
+  location: /junofs/users/yangyf/workdir/jsub
 
-repo:
-  type: file_system
-  param:
-    dir: ~/jsub/repo
-    format: compact
 
-content:
-  type: file_system
-  param:
-    dir: ~/jsub/content
-
-bootstrap: shell
-
-navigator:
-  - xixi
-  - python
-  - hehe
-
+### Backend setting
 backend:
   default: dirac
-  work_dir: ~/jsub/work
-  predefined:
-    local:
-      type: local
-      launcher: arg
-    fg:
-      type: local
-      launcher: arg
-      param:
-        foreground: True
-    condor:
-      type: condor
-      launcher: arg
-      param:
-        work_dir: ~/jsub/work
-    dirac:
-      type: dirac
-      launcher: arg
-      param:
-        site:
-          - CLOUD.IHEP.cn
-          - GRID.JINR.ru
-          - CLUSTER.USTC.cn
 
-aux:
-  after_sequence: []
-  before_submit: []
-  after_submit: [dirac_task]
+  local:    # Running subjobs locally as subprocesses in background
+    type: local
+    launcher: arg
+  dirac:    
+	type: dirac
+	launcher: dirac    # relevant JSUB driver executable
 
-match:
-  - boss
-  - dirac
-  - boss_dirac:
-      param:
-        boss: boss
-        dirac: dirac
+    # Config backend settings here
+#    param:
+#      site:
+#        - CLOUD.IHEP.cn
+#        - GRID.JINR.ru
+#        - CLUSTER.USTC.cn
+
+
+
+
