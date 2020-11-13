@@ -1,0 +1,8 @@
+document cmt_action_runner make -group=cmt_actions action_value=gmake'"'" "'"'bin=../amd64_linux26/'"'" "'"'
+make_fragment make_header /cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc830/Pre-Release/J20v1r1-branch/ExternalLibs/CMT/v1r26/mgr/fragments/make_header
+make_fragment dependencies /cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc830/Pre-Release/J20v1r1-branch/ExternalLibs/CMT/v1r26/mgr/fragments/dependencies
+make_fragment cleanup_header /cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc830/Pre-Release/J20v1r1-branch/ExternalLibs/CMT/v1r26/mgr/fragments/cleanup_header
+make_fragment cmt_action_runner -header=cmt_action_runner_header /cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc830/Pre-Release/J20v1r1-branch/ExternalLibs/CMT/v1r26/mgr/fragments/cmt_action_runner
+make_fragment cmt_action_runner_header /cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc830/Pre-Release/J20v1r1-branch/ExternalLibs/CMT/v1r26/mgr/fragments/cmt_action_runner_header
+make_fragment document_header /cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc830/Pre-Release/J20v1r1-branch/ExternalLibs/CMT/v1r26/mgr/fragments/document_header
+make_fragment dependency /cvmfs/juno.ihep.ac.cn/sl6_amd64_gcc830/Pre-Release/J20v1r1-branch/ExternalLibs/CMT/v1r26/mgr/fragments/dependency

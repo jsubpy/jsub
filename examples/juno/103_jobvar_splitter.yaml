@@ -1,0 +1,55 @@
+## -----------------------------------
+## This example showcases the usage of jobvar splitter with a gendecay task in LS detector
+## -----------------------------------
+taskName: juno_sim_jobvar_splitter
+experiment: juno
+softVersion: 'sl6_amd64_gcc830/Pre-Release/J20v1r0-Pre2'
+
+backend: 
+    type: dirac
+    outputSubDir: 'jsub_tests'
+
+splitter:
+    ## A splitByJobvars generate job variable lists and combine them into sets. For each variable set, the splitter generates one subjob accordingly.
+    mode: splitByJobvars 
+    maxSubJobs: 500     ## the resulted number of subjobs won't exceed this number
+    evtMaxPerJob: 5000
+    jobvarLists:
+        ## The jobvar lists are grouped. 
+        ## For jobvars in the same group, the length of their common var-set list is decided by the shortest jobvar list. 
+        ## For jobvar sets in different groups, the combining result is their Cartesian product.
+        ## Jobvars without group attribute would make a final common var-set list with the combining result of all jobvar groups.
+
+        ## In this example, there shall be 6*20=120 jobs, each with a unique seed.
+        nuclear:
+            type: enumerate
+            list: ['U-238','Th-232','K-40','Pb-210','C-14','Kr-85']
+            group: nuclear  
+        subjob:   
+            type: range
+            first: 1    ## default 1
+            step: 1     ## default 1
+            length: 20  ## default 100000
+            group: same_nuclear 
+        seed:
+            type: range
+            first: 1
+            step: 1
+
+workflow:
+    steps: [detsim]
+
+    detsim: 
+        ## The values of jobvars can be referenced in workflow setting.
+        seed: '$(seed)'     
+        output: '$(nuclear).$(subjob).detsim.root'
+        userOutput: '$(nuclear).$(subjob).user.detsim.root'
+        additionalArgs: 'gendecay --nuclear $(nuclear) --volume pTarget --material LS'
+
+        ## fullArgs = seed + ... + additionalArgs
+        #fullArgs: '--evtmax 5000 --seed $(seed) --output $(nuclear).$(subjob).detsim.root --user-output $(nuclear).$(subjob).user.detsim.root gendecay --nuclear $(nuclear) --volume pTarget --material LS'
+
+            
+    
+    
+        

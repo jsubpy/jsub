@@ -5,6 +5,6 @@ cpu_core: 0
 ignore_error: True
 pass_var:
   sysvar: JSUB_+env
-  jobvar: arg
+  jobvar: JSUB_+env
   actvar: JSUB_+env
   depvar: pipe

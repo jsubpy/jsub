@@ -31,16 +31,16 @@ class BackendManager(object):
 			delete_result = None
 		return(delete_result)
 	
-	def get_log(self, backend_data,  task_data = None, path = None, sub_ids = []):
+	def get_log(self, backend_data,  task_data = None, path = None, sub_ids = [], status = [], njobs = None):
 		'''
 		fetch the log files from backend, put to target path.
 		getlog_result should return in the format {sub_id:{'OK':True/False,'Message':str}}
 		'''
 		backend = self.__ext_mgr.load_ext_common('backend', backend_data)
-		try:
-			getlog_result = backend.get_log(task_data = task_data, path = path, sub_ids = sub_ids)
-		except:
-			getlog_result = None
+#		try:
+		getlog_result = backend.get_log(task_data = task_data, path = path, sub_ids = sub_ids, status= status, njobs = njobs)
+#		except:
+#			getlog_result = None
 		return(getlog_result)
 		
 

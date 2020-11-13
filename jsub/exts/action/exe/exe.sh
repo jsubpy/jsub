@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# This action module allow user to execute a script
+# Attributes:
+#	-exe: the name of the script to execute
+#	-argument: can be a jobvar
+
 current_dir=$(pwd)
 
 if [ -n "$JSUB_log_dir" ]; then
@@ -17,28 +22,17 @@ else
     exe_path="${JSUB_input_dir}/${JSUB_exe}"
 fi
 
+
 # pass accepted arguments to the exe
-job_args=''
-save_value=0
-for arg in "$@"
-do
-    if [ "$save_value" == 1 ]; then
-        job_args="${job_args} \"$arg\""
-        save_value=0
-        continue
-    fi
+if [ -n "$JSUB_argumentJobvar" ]; then
+	eval JSUB_argument='$JSUB_'$JSUB_argumentJobvar
+fi
+if [ -n "$JSUB_argument_jobvar" ]; then
+	eval JSUB_argument='$JSUB_'$JSUB_argument_jobvar
+fi
 
-    for accepted_arg in $JSUB_accepted_args
-    do
-        if [ "--$accepted_arg" == "$arg" ]; then
-            job_args="${job_args} \"$arg\""
-            save_value=1
-            break
-        fi
-    done
-done
-
-# execution of exe
+#execution
+chmod +x $exe_path
 (time eval \"$exe_path\" $JSUB_argument $job_args) 1>"$out" 2>"$err"
 
 # save the exit code

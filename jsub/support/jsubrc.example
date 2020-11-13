@@ -4,30 +4,21 @@
 #==================================================================================
 
 ###    The packages to be loaded to JSUB. JSUB would search for extension modules according to the order given here.
-package: [jsub_juno, jsub_cepc, jsub_dirac, jsub.exts]
+package: [jsub_juno, jsub_dirac]
 
 ### Location to put task information files; may need big space for log and output files
 taskDir: 
-  location: /junofs/users/yangyf/workdir/jsub
-
+  location: /junofs/users/USER_NAME/jsub
 
 ### Backend setting
 backend:
   default: dirac
-
-  local:    # Running subjobs locally as subprocesses in background
-    type: local
-    launcher: arg
-  dirac:    
-	type: dirac
-	launcher: dirac    # relevant JSUB driver executable
-
+#  dirac:    
     # Config backend settings here
-#    param:
-#      site:
-#        - CLOUD.IHEP.cn
-#        - GRID.JINR.ru
-#        - CLUSTER.USTC.cn
+#   site:
+#     - CLOUD.IHEP.cn
+#     - GRID.JINR.ru
+#     - CLUSTER.USTC.cn
 
 
 

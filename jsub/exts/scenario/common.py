@@ -1,3 +1,5 @@
+import copy
+
 class Common(object):
     def __init__(self, param):
         self.__param = param

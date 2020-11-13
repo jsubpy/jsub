@@ -32,6 +32,7 @@ class SplitByJobvars(object):
 		raw_jobvars.update(self.__param.get('jobvar_lists',{}))
 		max_cycle = self.__param.get('max_subjobs',100000)
 		max_cycle = self.__param.get('maxSubjobs',max_cycle)
+		max_cycle = self.__param.get('maxSubJobs',max_cycle)
 
 
 		# processing raw jobvar
@@ -110,9 +111,12 @@ class SplitByJobvars(object):
 					expander=copy.deepcopy(orig_jobvars)
 					expander.update(new_jobvars)
 					expanded_list.append(expander)
-				
+			
+			if len(expanded_list)>max_cycle:
+				expanded_list=expanded_list[:max_cycle]	
 			overall_jobvar_list=copy.deepcopy(expanded_list)
-	
+			
+
 		# attach vars in default group
 		cycle = 0
 		varlist_default_group = []		# [jobvar_default_group for subjobs]
@@ -152,18 +156,18 @@ class SplitByJobvars(object):
 				jobvars = copy.deepcopy(overall_jobvar_list[idx])
 			
 				for key in compstr_list:
-					regex='\$\(([^)]+)'
-					regex2='\$\{([^}]+)'
-					while re.search(regex, jobvars[key]):
-						match=re.search(regex, jobvars[key])
+					regex='\$\(([^)]+)'		# match $(jobvar)
+#					regex2='\$\{([^}]+)'	# match ${jobvar}
+					while re.search(regex, str(jobvars[key])):
+						match=re.search(regex, str(jobvars[key]))
 						var_name=match.group(0)[2:]
 						s=jobvars[key].replace('$('+var_name+')',str(jobvars[var_name]))
 						jobvars[key]=s
-					while re.search(regex2, jobvars[key]):
-						match=re.search(regex2, jobvars[key])
-						var_name=match.group(0)[2:]
-						s=jobvars[key].replace('${'+var_name+'}',str(jobvars[var_name]))
-						jobvars[key]=s
+#					while re.search(regex2, jobvars[key]):
+#						match=re.search(regex2, jobvars[key])
+#						var_name=match.group(0)[2:]
+#						s=jobvars[key].replace('${'+var_name+'}',str(jobvars[var_name]))
+#						jobvars[key]=s
 
 				overall_jobvar_list[idx]=copy.deepcopy(jobvars)
 

@@ -1,0 +1,33 @@
+## ----------------------------------
+## A simple example showing how to run jobs on shell
+## ----------------------------------
+taskName: juno_sim_local
+experiment: juno
+softVersion: 'J20v1r0-Pre2'
+
+
+backend: 
+    ## Running backend jobs (as background processes) on shell
+    type: local 
+    ## Max number of jobs that can be submitted, by default 4.
+    maxSubmit: 5
+
+
+splitter:
+    mode: splitByEvent 
+    evtMaxPerJob: 1000 
+    njobs: 50 ## the jobs exceeding maxSubmit of backend would be cut off  
+
+
+workflow:
+    steps: [detsim] 
+
+    detsim: 
+        seed: 1  
+        additionalArgs: 'gun --particles e+ --momentums 1.398'
+
+
+            
+    
+    
+        

@@ -7,10 +7,10 @@ from jsub.util import safe_mkdir
 class FileSystem(object):
     def __init__(self, param):
         self.__param = param
-        self.__content_dir = os.path.expanduser(param.get('dir', '~/jsub/task_info'))
+        self.__content_dir = os.path.expanduser(param.get('taskDir', '~/jsub'))
 
     def __abs_path(self, task_id, path):
-        return os.path.join(self.__content_dir, str(task_id), path)
+        return os.path.join(self.__content_dir, str(task_id),'taskInfo', path)
 
     def put(self, task_id, src, dst):
         dst_abs = self.__abs_path(task_id, dst)

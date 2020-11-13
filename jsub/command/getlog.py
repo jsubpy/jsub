@@ -3,16 +3,22 @@ import click
 from jsub import Jsub
 
 class Getlog(object):
-	def __init__(self, jsubrc, task_id, sub_id, path):
+	def __init__(self, jsubrc = None, task_id = None, sub_id = None, path = None, status = None, njobs = None):
 		self.__jsubrc = jsubrc
 		self.__task_id = task_id
 		self.__sub_id = sub_id
 		self.__path = path
+		self.__status = status
+		self.__njobs = njobs
 
 	def execute(self):
 		j = Jsub(self.__jsubrc)
-		if not self.__sub_id:
-			click.echo("No sub ID specified, can't fetch log files.") 
+		click.echo("Fetching the log files of task %s"%(self.__task_id))
+		if self.__sub_id:
+			click.echo("Specifying sub IDs: %s"%(self.__sub_id))
+		if self.__status:
+			click.echo("Specifying job status: %s"%(self.__status))
+		if (not self.__status) and (not self.__sub_id):
+			click.echo("Cannot fetch log files. Please specify sub IDs or job status for the subjobs that you want to fetch log files.")
 		else:
-			click.echo("Fetching the log files of subjob %s to the path: %s"%(self.__sub_id,self.__path))
-			j.getlog(self.__task_id, self.__sub_id, path=self.__path)
+			j.getlog(self.__task_id, self.__sub_id, self.__status, self.__njobs, path=self.__path)	

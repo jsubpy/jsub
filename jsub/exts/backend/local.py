@@ -35,11 +35,31 @@ class Local(Common):
 
 		self._foreground = param.get('foreground', False)
 		self._max_submit = param.get('max_submit', 4)
+		self._max_submit = param.get('maxSubmit', self._max_submit)
 
 		self.initialize_common_param()
 
 	def property(self):
 		return {'run_on': 'local', 'name': 'local'}
+
+	def get_log(self, task_data = None, path = './', sub_ids = [], status = [], njobs = 10):
+		task_id = task_data.get('id')
+		getlog_result={}
+		if status:
+			print('Cannot filter subjobs with status on local backend, please filter sub_ids instead.')
+		for sid in sub_ids:
+			try:
+				#cp logfiles from runtime folder to log folder
+				source_folder = os.path.join(self.get_run_root(task_id),'subjobs',str(sid),'log')
+				destination_folder = os.path.join(self.get_task_root(task_id),'logfiles',str(sid))
+				os.system('mkdir -p %s >/dev/null 2>/dev/null'%destination_folder)
+				os.system('mv %s/* %s >/dev/null 2>/dev/null'%(source_folder,destination_folder))
+				getlog_result.update({sid:{'OK':True,'Message':''}})
+			except:
+				self._logger.error('Failed to get log files of subjob %s' % (sid))
+				getlog_result.update({sid:{'OK':False,'Message':'Failed to copy logfiles to location.'}})
+				continue
+		return getlog_result
 
 	def submit(self, task_id, launcher_param,  sub_ids=None):
 		launcher_exe = launcher_param['executable']
@@ -50,7 +70,7 @@ class Local(Common):
 		for sub_id in sub_ids:
 			if count >= self._max_submit:
 				print("Exceeding max submit on local backend. (%d subjobs)"%self._max_submit)
-				break
+				
 
 			try:
 				launcher = os.path.join(self.get_run_root(task_id), launcher_exe)

@@ -9,11 +9,14 @@ import threading
 import signal
 import subprocess
 import random
+import resource
 
 try:
 	from Queue import Queue
+	from Queue import Empty
 except ImportError:
 	from queue import Queue
+	from queue import Empty
 
 
 ################################################################################
@@ -23,6 +26,11 @@ def mkdir_safe(directory):
 	if not os.path.exists(directory):
 		os.makedirs(directory)
 
+def memory_usage_resource():
+	rusage_denom = 1024.
+	mem1 = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / rusage_denom
+	mem2 = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss / rusage_denom
+	return mem1,mem2
 
 ################################################################################
 # Setup the logger
@@ -235,7 +243,7 @@ class UnitThread(threading.Thread):
 		self.__pid = 0
 		self.__queue_pid = Queue()
 
-		jsub_logger.debug('Execute unit: %s', self.__unit)
+		jsub_logger.info('Execute unit: %s', self.__unit)
 		jsub_logger.debug(' - args: %s', self.__args)
 		jsub_logger.debug(' - cwd: %s', self.__cwd)
 		jsub_logger.debug(' - env: %s', self.__env)
@@ -379,9 +387,26 @@ class UnitRunner:
 			var[var_type][m.group(2)] = m.group(3)
 		return var
 
-	def __wait_finished_unit(self, timeout=None):
-		item = self.__queue_unit.get(timeout=timeout)
-		unit = item['unit']
+	def __wait_finished_unit(self, timeout=-1):
+		tcount=0
+		unit=None
+		while (timeout-tcount)/(int(timeout>=0)-0.5)>0:
+			try:
+#				mem1,mem2=memory_usage_resource()
+#				jsub_logger.debug('Memory usage:  %s, %s'%(mem1,mem2))
+				item = self.__queue_unit.get(timeout=15)
+
+				# queue is not empty: successfully return unit info
+				unit = item['unit']
+				
+				break
+			except Empty:	# queue is empty: keep waiting until timeout
+				pass
+
+		if unit is None: 	# wait for 1 last second after timeout
+			item = self.__queue_unit.get(timeout=3)
+			unit = item['unit']
+			
 
 		jsub_logger.info('Unit "%s" finished with exit code: %s', unit, item['returncode'])
 		jsub_logger.debug((' - Standard output:\n%s' % item['stdout']).rstrip('\n'))
@@ -423,7 +448,7 @@ class UnitRunner:
 		while self.__unit_threads:
 			try:
 				result = self.__wait_finished_unit(30)
-			except Queue.Empty:
+			except Empty:
 				break
 			unit = result['unit']
 			self.__unit_threads[unit].join()
@@ -436,7 +461,7 @@ class UnitRunner:
 		while self.__unit_threads:
 			try:
 				result = self.__wait_finished_unit(5)
-			except Queue.Empty:
+			except Empty:
 				for unit in list(self.__unit_threads):
 					del self.__unit_threads[unit]
 					killed_units[unit] = -1

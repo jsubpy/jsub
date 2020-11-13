@@ -23,9 +23,9 @@ class Operation(object):
 		from jsub.operation.status import Status
 		return Status(self.__manager, task_id, states, silent).handle()
 
-	def getlog(self, task_id, sub_id, path):
+	def getlog(self, task_id, sub_id, status ,njobs, path):
 		from jsub.operation.getlog import Getlog
-		return Getlog(self.__manager, task_id, sub_id = sub_id, path = path).handle()
+		return Getlog(self.__manager, task_id, sub_id, status, njobs, path = path).handle()
 
 	def ls(self, task_id, update):
 		from jsub.operation.ls import Ls

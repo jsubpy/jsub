@@ -106,8 +106,13 @@ class Submit(object):
 				self.__logger.info('This task has already been submitted to backend, rerun the command with "-r" option if you wish to delete current jobs and resubmit the task.') 
 				return
 		else:	
+			self.__logger.info('Removing submitted jobs on backend before resubmission.') 
 			task_id = self.__task.data.get('backend_task_id')
+			#remove previously generated files in job folder
 			job_ids = self.__task.data.get('backend_job_ids')
+			run_root = self.__backend_mgr.get_run_root(self.__task.data['backend'], self.__task.data['id'])
+			job_root=os.path.join(run_root,'subjobs')
+			safe_rmdir(job_root)
 			if task_id:
 				self.__backend_mgr.delete_task(self.__task.data['backend'],backend_task_id = task_id)
 			elif job_ids:

@@ -1,0 +1,36 @@
+# a JUNO example that involves running custom juno software 
+taskName: junosoft_test
+backend: 
+    type: dirac
+    site:
+      - CLOUD.JINRONE.ru
+
+experiment: juno
+softVersion: 'J20v1r0-Pre2' 
+
+splitter:
+    mode: splitByJobvars
+    jobvar_lists:
+        detsim_output:
+            type: lines_in_file
+            file: './custom_example/filenames'
+        seed:
+            type: lines_in_file
+            file: './custom_example/seeds'
+           
+
+outputSubDir: 'junosoft'
+evtMax: 1000
+
+workflow:
+    steps: [junosoft, detsim]
+
+    junosoft:
+        type: juno_software     # for step name other than reserved step-type keywords, it's necessary to define it's types
+        software: offline/InstallArea/amd64_linux26/bin/Muon.exe        #under $JUNOTOP
+        args: '-seed $(seed) -o Muon.$(seed).txt -n 5 -v Rock -mult 1 -music_dir  ${JUNOTOP}/data/Generator/Muon/data'
+
+    detsim:
+        fullArgs: '--seed $(seed) --output detsim-$(seed).root --user-output detsim-$(seed).user.root --pmtsd-v2 --pmtsd-merge-twindow 1.0 --pmt-hit-type 2 --no-gdml --anamgr-config-file tmp.py --detoption Acrylic hepevt --exe Muon --file Muon.$(seed).txt'
+        
+

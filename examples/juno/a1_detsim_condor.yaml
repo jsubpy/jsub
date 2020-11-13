@@ -1,0 +1,35 @@
+## --------------------------------------
+## Running Juno simulation on IHEPCondor backend
+## --------------------------------------
+
+taskName: juno_sim_IHEPCondor
+experiment: juno
+softVersion: 'J20v1r0-Pre2'
+
+
+backend: 
+    type: IHEPCondor
+    group: juno 
+
+    ## the full path of output PFN foder 
+#    outputDir: /junofs/.../juno_sim_condor
+		
+
+splitter:
+    mode: splitByEvent 
+    evtMaxPerJob: 1000 
+    njobs: 50
+
+
+workflow:
+    steps: [detsim] 
+
+    detsim: 
+        seed: 1       
+        additionalArgs: 'gun --particles e+ --momentums 1.398'
+
+
+            
+    
+    
+        

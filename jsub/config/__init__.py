@@ -45,6 +45,8 @@ def load_config_string(s, fmt=''):
     return _load_config_guess(s)
 
 def load_config_file(fn, fmt=''):
+    if not os.path.exists(fn):
+        return {}
     with open(fn, 'r') as f:
         file_content = f.read()
         file_content = file_content.replace('\t','    ')    # allow \t in yaml

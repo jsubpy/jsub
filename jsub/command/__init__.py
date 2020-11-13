@@ -123,12 +123,14 @@ def package(ctx):
 @cli.command()
 @click.pass_context
 @click.argument('task_id', type=int)
-@click.option('--sub_id', '-s', type=str, default='', help ='The sub IDs of the jobs to fetch log file, separate numbers with comma.')
-@click.option('--path', '-p', type=str, default='./', help ='The path to which to dump log files, "./" by default.')
-def getlog(ctx, task_id,  sub_id ,path):
+@click.option('--sub_id', '-i', type=str, default='', help ='Filter the sub_ids of the jobs that you want to fetch log files, separate numbers with comma.')
+@click.option('--status', '-s', type=str, default='', help ='Filter the status of the jobs that you want to fetch log files (DFWRO)')
+@click.option('--njobs', '-n', type=str, help ='The maximum number of jobs for log retrieval. (10 by default)')
+@click.option('--path', '-p', type=str, default='', help ='The path to which to dump log files, jsub task dir by default.')
+def getlog(ctx, task_id,  sub_id ,path, status, njobs):
 	"""Retrieve log files of selected subjobs."""
 	from jsub.command.getlog import Getlog
-	cmd = Getlog(jsubrc=ctx.obj['jsubrc'], task_id = task_id, sub_id = sub_id, path = path)
+	cmd = Getlog(jsubrc=ctx.obj['jsubrc'], task_id = task_id, sub_id = sub_id, path = path, status = status, njobs = njobs)
 	cmd.execute()
 
 @cli.command()
@@ -137,7 +139,7 @@ def getlog(ctx, task_id,  sub_id ,path):
 @click.option('--failed' ,'-f' , is_flag=True, default = False, help='reschedule jobs with Failed status')
 @click.option('--running' ,'-r' , is_flag=True, default = False, help='reschedule jobs with Running status')
 @click.option('--waiting' ,'-w' , is_flag=True, default = False, help='reschedule jobs with Waiting status')
-@click.option('--sub_id', '-s', type=str, default='', help ='List the subjobs with matched sub IDs, separate numbers with comma.')
+@click.option('--sub_id', '-i', type=str, default='', help ='List the subjobs with matched sub IDs, separate numbers with comma.')
 @click.option('--backend_id', '-b', type=str, default='', help ='List the subjobs with matched backend job IDs, separate numbers with comma.')
 @click.pass_context
 

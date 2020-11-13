@@ -59,9 +59,9 @@ class Jsub(object):
 		op = self.__load_operation()
 		return op.status(task_id, states, silent)
 
-	def getlog(self, task_id, sub_id, path='./'):
+	def getlog(self, task_id, sub_id, status, njobs, path='./'):
 		op = self.__load_operation()
-		return op.getlog(task_id, sub_id, path)
+		return op.getlog(task_id, sub_id, status, njobs, path)
 
 	def reschedule(self, task_id, status, sub_id, backend_id):
 		op = self.__load_operation()

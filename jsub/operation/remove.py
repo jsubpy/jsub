@@ -35,11 +35,17 @@ class Remove(object):
 			else:
 				self.__logger.info('Removing task on backend.')
 				task_result = self.__backend_mgr.delete_task(self.__task.data['backend'],backend_task_id = backend_task_id)
+				if task_result is None:
+					task_result = self.__backend_mgr.delete_jobs(self.__task.data['backend'],backend_job_ids = backend_job_ids)
+
 				if (task_result):
 					result=task_result['Value']
 					result.update({'Backend':self.__task.data['backend']['type']})
-					self.__logger.info(result)
-				self.__logger.info('Removing task run files.')
+					try:
+						self.__logger.info('Successfully deleted %d jobs on backend.'%len(result['JobID']))
+					except:
+						self.__logger.info(result)
+				self.__logger.info('Removing runtime files for task.')
 		try:
 			run_root = self.__backend_mgr.get_run_root(self.__task.data['backend'], self.__task.data['id'])
 			safe_rmdir(run_root)

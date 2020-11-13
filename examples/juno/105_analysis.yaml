@@ -1,0 +1,44 @@
+## ----------------------------------------
+## demo for juno analysis
+## ----------------------------------------
+taskName: juno_custom_Alg
+experiment: juno
+softVersion: 'J20v1r0-Pre2'
+
+backend:
+    type: dirac
+    outputSubDir: 'jsub_tests'
+
+splitter:
+    mode: splitByJobvars
+    maxSubJobs: 20
+    evtMaxPerJob: 1000
+
+    jobvarLists:
+        idx:
+            type: range
+            length: 10
+
+workflow:
+    steps: [myAlg]
+
+    myAlg:
+        type: 'juno_alg'
+        # Users shall provide a job configuration file template for the algorithm and the referenced DLLs.
+        # These files would be put into input sandbox. 
+        # The folders of Sniper.LoadDll() in the config would be auto-redirected.
+        soFile: 
+            - './JsubDummyAlg/amd64_linux26/libJsubDummyAlg.so'       
+            - './JsubHelloWorld/amd64_linux26/libJsubHelloWorld.so'
+#       jobConfig: './JsubDummyAlg/share/run.py'   # local position
+        jobConfig: './JsubHelloWorld/share/run.py'   # local position
+        
+        # Users may use case-sensitive text replacement to set subjob-dependent parameters.
+        textReplace: 
+            # keyword: replacement
+            OUTPUT1: 'a/output.$(idx).1.root'     
+            OUTPUT2: 'b/output.$(idx).2.root'     
+        # what files to be uploaded as output data, for (dirac backend)
+        outputUpload:
+            - '*root'
+

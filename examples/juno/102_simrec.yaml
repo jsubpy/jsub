@@ -1,0 +1,38 @@
+## ----------------------------------
+## An example of having multi-steps in the workflow
+## ----------------------------------
+taskName: juno_simrec
+experiment: juno
+softVersion: 'J20v1r0-Pre2'
+
+backend: 
+    type: dirac
+    outputSubDir: 'jsub_tests'
+
+splitter:
+    mode: splitByEvent
+    evtMaxPerJob: 1000 
+    njobs: 50
+
+
+workflow:
+    steps: [detsim, elecsim, calib, rec]  
+
+    detsim: 
+        seed: 1 ## when in splitByEvent mode, the seeds are incremental by default
+        particles: e+
+        momentums: 1.398    #MeV
+        additionalArgs: ''
+        ## when gun params are defined:  full_args= '--seed X --output X --user-output X $(additionalArgs) gun --particles X ...'
+
+    elecsim:
+        ## when detsim and elecsim are both in the workflow, the output of detsim automatically feeds into elecsim
+        seed: 10
+        rate: 1
+        additionalArgs: ''
+        
+    #calib:        # if a step only uses default settings, it's description can be skipped
+    #    additionalArgs: ''   
+    
+    
+        
