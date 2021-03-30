@@ -3,7 +3,7 @@
 ## ----------------------------------
 taskName: juno_simrec
 experiment: juno
-softVersion: 'J20v1r0-Pre2'
+softVersion: 'centos7_amd64_gcc830/Pre-Release/J20v1r0-Pre2'
 
 backend: 
     type: dirac
@@ -23,12 +23,13 @@ workflow:
         particles: e+
         momentums: 1.398    #MeV
         additionalArgs: ''
-        ## when gun params are defined:  full_args= '--seed X --output X --user-output X $(additionalArgs) gun --particles X ...'
+        ## when gun params are defined:  full_args= '--seed XXX --output XXX --user-output XXX $(additionalArgs) gun --particles XXX --momentums XXX ...'
 
     elecsim:
-        ## when detsim and elecsim are both in the workflow, the output of detsim automatically feeds into elecsim
+        ## when detsim and elecsim are both in the workflow, the output of detsim automatically feeds into elecsim. Same for elecsim-calib, calib-rec...
         seed: 10
         rate: 1
+        ## when gun params are not defined:  full_args= '--seed XXX --output XXX --user-output XXX $(additionalArgs)'
         additionalArgs: ''
         
     #calib:        # if a step only uses default settings, it's description can be skipped

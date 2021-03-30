@@ -25,6 +25,7 @@ class SplitByEvent(object):
 	def split(self):
 		evtmax = self.__param.get('evtMax',10)
 		evtmax = self.__param.get('evtMaxPerJob',evtmax)
+		index0 = self.__param.get('index0',0)
 		totalEvents = self.__param.get('totalEvents')
 		maxSubjobs = self.__param.get('maxSubjobs',100000)
 		njobs = self.__param.get('njobs')
@@ -42,12 +43,13 @@ class SplitByEvent(object):
 		# expand jobvars to jobvar list: add suffix for strings; or add by idx for integers
 		jobvar_list=[]
 		for idx in range(njobs):
+			idx_sum = idx + index0
 			jobvar_set={}
 			for key,value in jobvarsToSeq.items():
 				try: 	#int	
-					new_value=int(value)+idx
+					new_value=int(value)+idx_sum
 				except:	#str
-					new_value=str(value)+'_%s'%idx
+					new_value=str(value)+'_%s'%idx_sum
 
 				jobvar_set.update({key:new_value})
 			for key,value in jobvars.items():

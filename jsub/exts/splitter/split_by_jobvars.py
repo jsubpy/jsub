@@ -37,13 +37,15 @@ class SplitByJobvars(object):
 
 		# processing raw jobvar
 		groups={}
-		compstr_list=[]
+		compstr_list=[]		# list of jobvars with composite_string type
+		eval_list=[]		# list of jobvars with eval type
 		raw_jobvar_content={}
+		priority={}
 		for jobvar_name, value in raw_jobvars.items():
 			if 'type' not in value:
 				raise JobvarListNotSetupError('Jobvar list type not setup: %s', jobvar_name)
 
-			# register group
+			# register jobvar groups
 			group=value.get('group','default')
 			if group in groups:
 				groups[group].append(jobvar_name)
@@ -51,9 +53,17 @@ class SplitByJobvars(object):
 				groups[group]=[jobvar_name]
 			
 
-			# register compstr
+			# register compstr/eval
 			if value['type'] in ['composite_string','compositeString']:
 				compstr_list.append(jobvar_name)
+			if value['type'] in ['eval']:
+				eval_list.append(jobvar_name)
+
+			# set priority, which determines the order of which the value is resolved. effective as integers in [0,9]
+			if 'priority' in value:
+				priority[jobvar_name]=value['priority']
+			else:
+				priority[jobvar_name]=10 # won't resolve
 
 			# put attributes in value to value['param']; to simplify user definition
 			param=value.get('param',{})
@@ -91,12 +101,12 @@ class SplitByJobvars(object):
 				except StopIteration:
 					break
 
-				#if only composite_string jobvar in group, then cycle = 1
-				all_jobvars_are_compstr = True
+				#if only composite_string/eval jobvars in group, then cycle = 1
+				all_jobvars_are_resolver = True
 				for jobvar in groups[group]:
-					if jobvar not in compstr_list:
-						all_jobvars_are_compstr = False
-				if all_jobvars_are_compstr:
+					if (jobvar not in (compstr_list+eval_list)):
+						all_jobvars_are_resolver = False
+				if all_jobvars_are_resolver:
 					break
 				
 
@@ -115,7 +125,6 @@ class SplitByJobvars(object):
 			if len(expanded_list)>max_cycle:
 				expanded_list=expanded_list[:max_cycle]	
 			overall_jobvar_list=copy.deepcopy(expanded_list)
-			
 
 		# attach vars in default group
 		cycle = 0
@@ -149,26 +158,40 @@ class SplitByJobvars(object):
 		
 			overall_jobvar_list=tmp_list
 
-		# handling the composite string jobvar
-		# replace $(var_name)/${var_name} with actual values in the subjob
-		if len(compstr_list)>0:
-			for idx in range(len(overall_jobvar_list)):
-				jobvars = copy.deepcopy(overall_jobvar_list[idx])
-			
-				for key in compstr_list:
-					regex='\$\(([^)]+)'		# match $(jobvar)
-#					regex2='\$\{([^}]+)'	# match ${jobvar}
-					while re.search(regex, str(jobvars[key])):
-						match=re.search(regex, str(jobvars[key]))
-						var_name=match.group(0)[2:]
-						s=jobvars[key].replace('$('+var_name+')',str(jobvars[var_name]))
-						jobvars[key]=s
-#					while re.search(regex2, jobvars[key]):
-#						match=re.search(regex2, jobvars[key])
-#						var_name=match.group(0)[2:]
-#						s=jobvars[key].replace('${'+var_name+'}',str(jobvars[var_name]))
-#						jobvars[key]=s
 
-				overall_jobvar_list[idx]=copy.deepcopy(jobvars)
+		# Resolving the values of composite_string and eval, from priority 10->0
+		# replace $(var_name)/${var_name} with actual values in the subjob
+		for i_subjob in range(len(overall_jobvar_list)):
+			jobvars = copy.deepcopy(overall_jobvar_list[i_subjob])
+			for jobvar in jobvars: #jobvar -> pythonic vars; (to do: avoiding conflict)
+				code_str=str(jobvar)+"='"+str(jobvars[jobvar])+"'"
+				exec(str(jobvar)+"='"+str(jobvars[jobvar])+"'") 			
+			for p_now in range(0,10)[::-1]:
+				for jobvar0 in jobvars:
+					if priority[jobvar0]==p_now:
+						# try resolving composite string
+						if jobvar0 in compstr_list:
+							regex='\$\(([^)]+)'		# match $(jobvar)
+							regex2='\$\{([^}]+)'	# match ${jobvar}
+							while re.search(regex, str(jobvars[jobvar0])):
+								match=re.search(regex, str(jobvars[jobvar0]))
+								var_name=match.group(0)[2:]
+								s=jobvars[jobvar0].replace('$('+var_name+')',str(jobvars[var_name]))
+								jobvars[jobvar0]=s
+#							while re.search(regex2, jobvars[jobvar0]):
+#								match=re.search(regex2, jobvars[jobvar0])
+#								var_name=match.group(0)[2:]
+#								s=jobvars[jobvar0].replace('${'+var_name+'}',str(jobvars[var_name]))
+#								jobvars[jobvar0]=s
+							
+						# try resolving eval
+						if jobvar0 in eval_list:
+							eval_result=eval(jobvars[jobvar0])
+							jobvars[jobvar0]=eval_result
+	
+						# update pythonic var
+						exec(str(jobvar0)+"='"+str(jobvars[jobvar0])+"'") 			
+
+			overall_jobvar_list[i_subjob]=copy.deepcopy(jobvars)
 
 		return overall_jobvar_list

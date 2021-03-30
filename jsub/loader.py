@@ -22,6 +22,7 @@ class PackageDirectoryNotFoundError(LoadError):
 
 
 def load_module(module_name):
+	
 	try:
 		__import__(module_name)
 	except ImportError as e:

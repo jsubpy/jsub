@@ -19,10 +19,12 @@ class Remove(object):
 		self.__backend_mgr   = self.__manager.load_backend_manager()
 		
 	def handle(self):
+		task_pool = self.__manager.load_task_pool()
 		try:
 			self.__task = self.__manager.load_task(self.__task_id)
 		except:
 			self.__logger.info('Failed to remove the task. Wrong task ID?')
+			task_pool.delete(self.__task_id)
 			return		
 
 		backend_task_id = self.__task.data.get('backend_task_id')
@@ -39,12 +41,20 @@ class Remove(object):
 					task_result = self.__backend_mgr.delete_jobs(self.__task.data['backend'],backend_job_ids = backend_job_ids)
 
 				if (task_result):
-					result=task_result['Value']
-					result.update({'Backend':self.__task.data['backend']['type']})
-					try:
-						self.__logger.info('Successfully deleted %d jobs on backend.'%len(result['JobID']))
-					except:
-						self.__logger.info(result)
+					if task_result['OK']:
+						result=task_result['Value']
+						result.update({'Backend':self.__task.data['backend']['type']})
+						try:
+							self.__logger.info('Successfully deleted %d jobs on backend.'%len(result['JobID']))
+						except:
+							self.__logger.info(result)
+					else:
+						try:
+							message=task_result['Message']
+							self.__logger.info('Failed to delete jobs on backend. Message: %s'%message)
+						except:
+							self.__logger.info('Failed to delete jobs on backend. Message unknown.')
+		
 				self.__logger.info('Removing runtime files for task.')
 		try:
 			run_root = self.__backend_mgr.get_run_root(self.__task.data['backend'], self.__task.data['id'])
@@ -53,7 +63,6 @@ class Remove(object):
 			pass
 
 		self.__logger.info('Removing task info files.')
-		task_pool = self.__manager.load_task_pool()
 		task_pool.delete(self.__task.data['id'])
 
 		self.__logger.info('Task %s successfully removed.'%self.__task.data['id'])

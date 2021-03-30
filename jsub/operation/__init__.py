@@ -27,6 +27,10 @@ class Operation(object):
 		from jsub.operation.getlog import Getlog
 		return Getlog(self.__manager, task_id, sub_id, status, njobs, path = path).handle()
 
+	def jobvar(self, task_id, sub_id, jobvar,max_cycle):
+		from jsub.operation.jobvar import Jobvar
+		return Jobvar(self.__manager, task_id, sub_id, jobvar,max_cycle).handle()
+
 	def ls(self, task_id, update):
 		from jsub.operation.ls import Ls
 		return Ls(self.__manager, task_id, update).handle()

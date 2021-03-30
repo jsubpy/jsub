@@ -68,6 +68,21 @@ def remove(ctx, force, task_id):
 
 @cli.command()
 @click.argument('task_id', type=int)
+@click.option('--sub_id','-i', type=int, default=None, help='Specifying a subjob id to inspect.')
+@click.option('--jobvar','-j' , type=str, default=None, help='Specifying a jobvar list to look at.')
+@click.option('--max_cycle','-n' , type=int, default=20, help='Maximum length of jobvar list to display')
+@click.pass_context
+def jobvar(ctx, task_id,sub_id=None,jobvar=None, max_cycle=20):
+	"""View the values of jobvar lists"""
+	from jsub.command.jobvar import Jobvar
+	cmd = Jobvar(jsubrc=ctx.obj['jsubrc'], task_id=task_id, sub_id=sub_id, jobvar=jobvar, max_cycle=max_cycle)
+	cmd.execute()
+
+
+
+
+@cli.command()
+@click.argument('task_id', type=int)
 @click.option('--status', '-s', type=str, default=None, help ='List the subjobs with matched running state.')
 @click.option('--silent', is_flag=True, help='Update task status info without printing message.')
 @click.pass_context

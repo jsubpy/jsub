@@ -46,6 +46,13 @@ class Getlog(object):
 					status.append(s)
 
 		getlog_result = self.__backend_mgr.get_log(self.__task.data['backend'],  task_data = self.__task.data, path = self.__path, sub_ids = self.__sub_id , status = status, njobs = self.__njobs)
+		ngood,nbad=0,0
 		for sid in getlog_result:
 			if getlog_result[sid]['OK']==False:
-				self.__logger.info('Failed to get the log file of subjob %s: %s'%(sid,getlog_result[sid]['Message']))
+				nbad+=1
+			else:
+				ngood+=1
+			
+		self.__logger.info('Successfully retrieved log file of %s subjobs'%ngood)
+
+

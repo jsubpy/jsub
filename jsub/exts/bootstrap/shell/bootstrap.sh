@@ -50,6 +50,8 @@ fi
 
 logging "Running the navigator: `basename ${navigator}`..."
 
+sleep 5 # give working node some time to setup env?
+
 "${navigator}/${navigator_exe}" "--task_sub_id=${task_sub_id}" \
     "--main_root=${main_root}" "--context_root=${context_root}" "--log_root=${log_root}" "--action_root=${action_root}" \
     "--run_root=${run_root}" "--input_root=${input_root}" "--output_root=${output_root}"

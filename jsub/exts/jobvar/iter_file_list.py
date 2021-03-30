@@ -6,7 +6,7 @@ class IterFileList(object):
 		self.__folder = param.get('folder')
 		with open(self.__filelist) as f:
 			self.__files = [x for x in f.read().splitlines() if os.path.isfile(x)]
-
+		
 	def next(self):
 		if len(self.__files)==0:
 			raise StopIteration

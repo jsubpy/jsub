@@ -3,12 +3,15 @@
 ## ---------------------------------------
 taskName: juno_sim
 experiment: juno
-softVersion: 'J20v1r0-Pre2'
-#softVersion: 'sl6_amd64_gcc830/Pre-Release/J20v1r0-Pre2' 
+## Define JUNO software version through a part of its path
+softVersion: 'centos7_amd64_gcc830/Pre-Release/J20v1r0-Pre2'
+## Alternatively, define soft version through architecture and release.
+#softVersion: 
+#   arch: 'centos7_amd64_gcc830/'
+#   release: 'J20v1r0-Pre2' 
 
 backend: 
     type: dirac
-
     ## When outputSubDir is defined, the final directory for output file would be: /<junofs-user-home>/<outputSubDir>/<taskName>
     outputSubDir: 'jsub_tests'
     ## Alternatively, user may specify the full path of output LFN folder with outputDir
@@ -32,10 +35,12 @@ workflow:
     steps: [detsim] 
 
     detsim:  
-        seed: 1 # the starting seed (in splitByEvent mode)
+        ## in splitByEvent mode, the seed here means the starting seed for the first subjob. Incremental for other subjobs.
+        seed: 1 
+        ## in splitByEvent mode, output filenames are automatically handled
 
-        ## additionalArgs are put after common attributes such as output, userOutput, input, seed, evtmax, and rate.
+        ## when gun params are not defined:  full_args= '--seed XXX --output XXX --user-output XXX $(additionalArgs)'
         additionalArgs: 'gun --particles e+ --momentums 1.398'
 
-
+        
 

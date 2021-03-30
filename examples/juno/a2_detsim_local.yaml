@@ -3,7 +3,7 @@
 ## ----------------------------------
 taskName: juno_sim_local
 experiment: juno
-softVersion: 'J20v1r0-Pre2'
+softVersion: 'centos7_amd64_gcc830/Pre-Release/J20v1r0-Pre2'
 
 
 backend: 

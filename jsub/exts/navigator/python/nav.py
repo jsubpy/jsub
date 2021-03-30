@@ -42,6 +42,7 @@ jsub_logger.setLevel(logging.DEBUG)
 
 FORMATTER = logging.Formatter('[%(asctime)s][%(name)s|%(levelname)s]: %(message)s', '%Y-%m-%d %H:%M:%S UTC')
 logging.Formatter.converter = time.gmtime
+logroot=None
 
 def add_stream_logger():
 	logger = logging.getLogger('JSUB')
@@ -53,6 +54,9 @@ def add_stream_logger():
 	logger.addHandler(ch)
 
 def add_file_logger(log_root):
+	global logroot
+	logroot=log_root
+
 	logger = logging.getLogger('JSUB')
 
 	mkdir_safe(log_root)
@@ -65,6 +69,18 @@ def add_file_logger(log_root):
 	logger.addHandler(fh)
 	logger.debug('='*80)
 
+def add_unit_logger(unit):
+	logger = logging.getLogger('JSUB_'+unit)
+
+	log_file = os.path.join(logroot,'unit',unit+'.log')
+
+	fh = logging.FileHandler(log_file)
+	fh.setLevel(logging.DEBUG)
+	fh.setFormatter(FORMATTER)
+
+	logger.addHandler(fh)
+	logger.debug('='*80)
+	
 add_stream_logger()
 
 
@@ -243,6 +259,8 @@ class UnitThread(threading.Thread):
 		self.__pid = 0
 		self.__queue_pid = Queue()
 
+		
+
 		jsub_logger.info('Execute unit: %s', self.__unit)
 		jsub_logger.debug(' - args: %s', self.__args)
 		jsub_logger.debug(' - cwd: %s', self.__cwd)
@@ -344,10 +362,32 @@ class UnitRunner:
 		var_arg  = self.__generate_var('arg',  data)
 		var_pipe = self.__generate_var('pipe', data)
 
+
+		add_unit_logger(unit)
+		self.__unit_logger=logging.getLogger('JSUB_'+unit)
+		self.__unit_logger.setLevel(logging.DEBUG)
+
 		jsub_logger.debug('Variables for unit "%s":', unit)
 		jsub_logger.debug(' - Passed by env: %s', var_env)
 		jsub_logger.debug(' - Passed by arg: %s', var_arg)
 		jsub_logger.debug(' - Passed by pipe: %s', var_pipe)
+		self.__unit_logger.debug('Variables for unit "%s":', unit)
+		self.__unit_logger.debug(' - Passed by env: %s', var_env)
+		self.__unit_logger.debug(' - Passed by arg: %s', var_arg)
+		self.__unit_logger.debug(' - Passed by pipe: %s', var_pipe)
+
+		# for DIRAC backend, activate website job logging
+		jobID = os.environ.get('DIRACJOBID', '0')
+		if jobID!='0':
+			from DIRAC.WorkloadManagementSystem.Client.JobReport import JobReport
+			jobReport = JobReport(int(jobID), 'JSUB script')
+			res_report = jobReport.setApplicationStatus("Start unit: %s"%unit)
+#			res_report = jobReport.setJobStatus(status='Running',minor=unit,application='Start unit')
+			if not res_report['OK']:
+				print('Failed to set dirac logging: %s' % res_report['Message'])
+
+
+
 
 		# generate args for UnitThread
 		args_basic = self.__args_basic(unit, data['type'], data['param']['executable'])
@@ -362,13 +402,14 @@ class UnitRunner:
 		stdin = self.__var_2_stdin(var_pipe)
 
 		# create thread for a unit
-		mkdir_safe(data['sysvar']['run_dir'])
-		mkdir_safe(data['sysvar']['log_dir'])
+#		mkdir_safe(data['sysvar']['run_dir'])
+#		mkdir_safe(data['sysvar']['log_dir'])
 		self.__unit_threads[unit] = UnitThread(self.__queue_unit, unit, args, cwd, env, stdin)
 		self.__unit_threads[unit].start()
 		self.__unit_threads[unit].unit_pid()
 
 	def start_units(self, data_units):
+
 		for unit, data in data_units.items():
 			if unit in self.__unit_threads:
 				jsub_logger.debug('Skip starting unit "%s", already running', unit)
@@ -406,11 +447,26 @@ class UnitRunner:
 		if unit is None: 	# wait for 1 last second after timeout
 			item = self.__queue_unit.get(timeout=3)
 			unit = item['unit']
-			
-
+	
+		
 		jsub_logger.info('Unit "%s" finished with exit code: %s', unit, item['returncode'])
 		jsub_logger.debug((' - Standard output:\n%s' % item['stdout']).rstrip('\n'))
 		jsub_logger.debug((' - Standard error:\n%s' % item['stderr']).rstrip('\n'))
+		self.__unit_logger.info('Unit "%s" finished with exit code: %s', unit, item['returncode'])
+		self.__unit_logger.debug((' - Standard output:\n%s' % item['stdout']).rstrip('\n'))
+		self.__unit_logger.debug((' - Standard error:\n%s' % item['stderr']).rstrip('\n'))
+
+		# for DIRAC backend, activate website job logging
+		jobID = os.environ.get('DIRACJOBID', '0')
+		if jobID!='0':
+			from DIRAC.WorkloadManagementSystem.Client.JobReport import JobReport
+			jobReport = JobReport(int(jobID), 'JSUB script')
+#			res_report = jobReport.setJobStatus(status='Running',minor=unit,application='Finished with exit code: %s'%item['returncode'])
+			res_report = jobReport.setApplicationStatus("Unit: %s finished with exit code %s"%(unit,item['returncode']))
+			if not res_report['OK']:
+				print('Failed to set dirac logging: %s' % res_report['Message'])
+
+
 
 		return item
 
@@ -422,6 +478,7 @@ class UnitRunner:
 		for var_type, var in outvar.items():
 			for k, v in var.items():
 				jsub_logger.info('Unit "%s" %s: %s = %s', unit, var_type, k, v)
+				self.__unit_logger.info('Unit "%s" %s: %s = %s', unit, var_type, k, v)
 
 		unit_info = result
 		unit_info['outvar'] = outvar
@@ -481,7 +538,8 @@ class TaskSubIdNotFoundError(Exception):
 class Navigator:
 	def __init__(self, context):
 		self.__context_general  = context['general']
-
+		self.__stop_after_unit_fail = context['general'].get('stop_after_unit_fail',False)
+	
 		task_sub_id = self.__context_general['task_sub_id']
 		all_jobvar = context['jobvar']
 		if task_sub_id not in all_jobvar:
@@ -547,9 +605,16 @@ class Navigator:
 			self.__unit_runner.start_units(data_units)
 			units_info = self.__unit_runner.finished_units()
 			jsub_logger.debug('Current unit (%s) -> Finished unit (%s)', vertice_zero_indegree, units_info.keys())
-			
+		
+			should_stop_because_unit_fail=False
 			for k,v in units_info.items():
 				unit_results.update({k:v['returncode']})
+				if v['returncode'] is not None: 
+					if int(v['returncode'])!=0 and self.__stop_after_unit_fail:
+						should_stop_because_unit_fail=True
+			if should_stop_because_unit_fail:
+				jsub_logger.debug('Execution of the workflow is stopped after a failed action step.')
+				break
 
 			if not units_info:
 				raise UnitCannotRunError('No unit could run: %s', vertice_zero_indegree)

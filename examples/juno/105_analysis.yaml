@@ -3,7 +3,9 @@
 ## ----------------------------------------
 taskName: juno_custom_Alg
 experiment: juno
-softVersion: 'J20v1r0-Pre2'
+softVersion:
+    arch: 'centos7_amd64_gcc830'
+    release: 'J20v1r0-Pre2'
 
 backend:
     type: dirac

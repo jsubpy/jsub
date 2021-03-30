@@ -1,0 +1,45 @@
+## --------------------------------------------------
+## Another example with juno elecsim, 
+##	  - use eval/composite string to set file name
+##	  - set outputLFN/userOutputLFN instead of output/userOutput
+## --------------------------------------------------
+taskName: juno_elecsim2
+experiment: juno
+softVersion: 'centos7_amd64_gcc830/Pre-Release/J20v2r0-Pre2'
+
+backend: 
+	type: dirac
+	outputSubDir: 'jsub_tests/'
+
+splitter:
+	## For jobs with input, splitByJobvars splitter is necessary so that the input filenames can be referenced in workflow setting
+	mode: splitByJobvars 
+	maxSubJobs: 500	 
+	jobvarLists:
+		input_LFN:
+		   ## can use 'jsub jobvar' command to check the values of this jobvar list
+		   type: find_lfns
+		   path: '/juno/production/ML/prd03_r'
+		   metaspec: ' "application=detsim" "tag=e+_0.0momentums" "softwareVersion=centos7_amd64_gcc830/Pre-Release/J20v2r0-Pre2"' 
+		seed:
+			type: range
+		elecsim_LFN:
+			## pythonic eval,  .../detsim/.../*detsim*root --> .../elecsim/.../*elecsim*root
+			type: eval
+			value: 'input_filename.replace("detsim","elecsim")' 
+			priority: 2	 ## from priority 9->0, the values of the eval/string jobvars are resolvedin order.
+
+workflow:
+	steps: [elecsim]
+
+	elecsim: 
+		evtMax: 100
+		rate: 1
+		seed: "$(seed)"
+		input: "$(input_LFN)"
+		## Can use outputLFN instead of output to assign full path, putting files into complex folder structures.
+		outputLFN: "/juno/user/.../$(elecsim_LFN)"	  # output to this LFN
+		userOutput: "elecsim_user-$(seed).root"		 # user output put under the DIRAC output dir
+	
+	
+		

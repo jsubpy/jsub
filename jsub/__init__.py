@@ -55,6 +55,10 @@ class Jsub(object):
 		op = self.__load_operation()
 		return op.show(task_id, dump)
 
+	def jobvar(self, task_id, sub_id, jobvar,max_cycle):
+		op = self.__load_operation()
+		return op.jobvar(task_id, sub_id, jobvar,max_cycle)
+
 	def status(self, task_id, states=None, silent=False):
 		op = self.__load_operation()
 		return op.status(task_id, states, silent)

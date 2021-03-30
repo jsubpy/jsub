@@ -1,11 +1,14 @@
 import os
+import logging
 
 from jsub.config import dump_config_string
+from jsub.util import safe_rmdir
 
 class Create(object):
 	def __init__(self, manager, task_profile):
 		self.__manager	  = manager
 		self.__task_profile = task_profile
+		self.__logger = logging.getLogger('JSUB')
 
 		self.__initialize_manager()
 
@@ -51,9 +54,15 @@ class Create(object):
 		task_id = task.data['id']
 
 
+		try:	# in case file not found error
+			self.__copy_input_file(task_id, scenario_input)
+			self.__dump_task_profile(task_id)
+		except Exception as e:
+			self.__logger.error('Failed to create jsub task, error with create input sandbox: %s'%str(e.args))
+			self.__delete_task(task_id)
+			# avoid printing success message
+			return None
 
-		self.__copy_input_file(task_id, scenario_input)
-		self.__dump_task_profile(task_id)
 
 		return task
 
@@ -61,6 +70,11 @@ class Create(object):
 	def __create_task(self, task_data):
 		task_pool = self.__manager.load_task_pool()
 		return task_pool.create(task_data)
+
+	def __delete_task(self, task_id):
+		task_pool = self.__manager.load_task_pool()
+		return task_pool.delete(task_id)
+		
 
 	def __copy_input_file(self, task_id, scenario_input):
 		content = self.__manager.load_content()

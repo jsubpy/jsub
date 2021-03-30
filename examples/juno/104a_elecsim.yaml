@@ -3,7 +3,7 @@
 ## --------------------------------------------------
 taskName: juno_elecsim
 experiment: juno
-softVersion: 'sl6_amd64_gcc830/Pre-Release/J20v1r0-Pre2'
+softVersion: 'centos7_amd64_gcc830/Pre-Release/J20v1r0-Pre2'
 
 backend: 
 	type: dirac
@@ -15,10 +15,11 @@ splitter:
 	maxSubJobs: 500	 
 	evtMaxPerJob: 5000
 	jobvarLists:
-		## One way to assign input file is to list the filenames in a text file.
+		## One way to assign input file is to list the logical filenames (LFN) in a text file.
 #		input_filename:
 #			type: lines_in_file 
 #			file: './lfnlist.example'   
+
 		## Another way is to filter LFN list in a given folder, using dirac-dms-find-lfns command
 		input_filename:
 		   type: find_lfns
@@ -27,18 +28,19 @@ splitter:
 		seed:
 			type: range
 
+
 workflow:
 	steps: [elecsim]
 
 	elecsim: 
-		seed: '$(seed)'	 # jobvars can be referenced in workflow setting
-		input: '$(input_filename)'
+		seed: '$(seed)'	 # jobvars can be referenced in some workflow settings
+		input: '$(input_filename)'                  # if a path is given, would omit dirname
+		output: 'elecsim.$(seed).root'              # same
+		userOutput: 'elecsim.user.$(seed).root'     # same
 		rate: 10
-		output: 'elecsim.$(seed).root'
-		userOutput: 'elecsim.user.$(seed).root'
 		additionalArgs: ''
-
 			
-	
+	    ## It's also possible to use fullArgs here. But it's noteworthy that the input/output filenames should be set under './', because that's where the driver scripts look for files on the DIRAC working nodes.
+        ## If input/output/user_output attributes are designated with
 	
 		

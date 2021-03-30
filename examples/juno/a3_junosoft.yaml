@@ -1,4 +1,6 @@
-# a JUNO example that involves running custom juno software 
+## -------------------------------------------------------------
+## a JUNO example that involves running custom juno software located under JUNO top directory
+## -------------------------------------------------------------
 taskName: junosoft_test
 backend: 
     type: dirac
@@ -6,7 +8,7 @@ backend:
       - CLOUD.JINRONE.ru
 
 experiment: juno
-softVersion: 'J20v1r0-Pre2' 
+softVersion: 'centos7_amd64_gcc830/Pre-Release/J20v1r0-Pre2'
 
 splitter:
     mode: splitByJobvars

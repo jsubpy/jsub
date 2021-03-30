@@ -60,7 +60,7 @@ class BackendManager(object):
 		return(reschedule_result)		
 
 
-	def status(self, backend_data, backend_task_id = 0, states = None):
+	def status(self, backend_data, backend_task_id = 0, states = None, silent=True):
 		'''
 			states: a string containing the list of job status users care about:	D/F/R/W/O, Done/Failed/Running/Waiting/Deleted
 			status_result:	if failure, return None to operation.status; when successful, return the following dict
@@ -73,7 +73,7 @@ class BackendManager(object):
 		'''
 		backend = self.__ext_mgr.load_ext_common('backend', backend_data)
 		try:
-			status_result = backend.status(backend_task_id, states) # this is not necessarily supported by every backend
+			status_result = backend.status(backend_task_id, states, silent=silent) # this is not necessarily supported by every backend
 		except:
 			status_result = {'OK':False,'Message':'Failed to retrieve info from backend.'}
 		return(status_result)

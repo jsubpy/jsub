@@ -15,4 +15,4 @@ class CompositeString(object):
 		return {'value': value}		
 	
 	def length(self):
-		return None
+		return self.__length

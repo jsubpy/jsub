@@ -19,7 +19,7 @@ class Status(object):
 		report=''	
 		if backend_task_id:
 			# backend_status in format 	{'OK': True/False, 'njobs': {state: njobs}, 'jobIDs':{state: [jobID]}}
-			backend_status=self.__backend_mgr.status(self.__task.data['backend'], backend_task_id, states=self.__states)		
+			backend_status=self.__backend_mgr.status(self.__task.data['backend'], backend_task_id, states=self.__states,silent=self.__silent)		
 			self.__logger.debug(backend_status)
 			try:
 				if backend_status['OK']:		
@@ -46,13 +46,13 @@ class Status(object):
 									idlist.append('%s:%s'%(jid,bid))
 						self.__logger.info('There are %d jobs with status %s:\n%s'%(len(jobIDs[status]),status,', '.join(idlist)))
 			else:
-				report = 'Failed to retrieve backend status for task %s. Error message from %s: %s'%(self.__task_id, self.__task.data['backend'].get('type','backend'), backend_status.get('Message'))
+				report = 'Failed to retrieve %s backend status for task %s.'%(self.__task.data['backend'].get('type','backend'), self.__task_id)
 				
 		else:
 			if self.__task.data['status']=='New':
 				report='The task has not been submitted yet.'
 			else:
-				report='Cannot retrieve the info of task %s on %s backend.'%(self.__task_id, self.__task.data['backend']['type'])
+				report='Cannot retrieve the info of JSUB task %s on %s backend: there is no valid backend task ID. (Bad submission?)'%(self.__task_id, self.__task.data['backend']['type'])
 
 		if (not self.__silent) and report:
 			self.__logger.info(report)

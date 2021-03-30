@@ -1,0 +1,27 @@
+taskName: run_script
+experiment: common
+
+backend: 
+    type: dirac
+    site:
+        - GRID.IHEP.cn
+
+splitter:
+    mode: splitByJobvars
+    maxSubjobs: 1
+    jobvar_lists:
+        idx:   
+            type: range
+            first: 1
+
+input:
+    common:
+        script.sh: script.sh
+
+workflow:
+    runScript:
+        type: exe
+        actvar:
+            exe: 'script.sh'
+            args: '' 
+            location: common      

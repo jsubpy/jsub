@@ -3,7 +3,7 @@
 ## -----------------------------------
 taskName: juno_sim_jobvar_splitter
 experiment: juno
-softVersion: 'sl6_amd64_gcc830/Pre-Release/J20v1r0-Pre2'
+softVersion: 'centos7_amd64_gcc830/Pre-Release/J20v1r0-Pre2'
 
 backend: 
     type: dirac
@@ -27,14 +27,15 @@ splitter:
             group: nuclear  
         subjob:   
             type: range
-            first: 1    ## default 1
-            step: 1     ## default 1
-            length: 20  ## default 100000
+#            first: 1    ## 1 by default
+#            step: 1     ## 1 by default
+            length: 20  ## 100000 by default
             group: same_nuclear 
         seed:
             type: range
-            first: 1
-            step: 1
+            first: 10001
+#            step: 1
+      
 
 workflow:
     steps: [detsim]
@@ -46,10 +47,12 @@ workflow:
         userOutput: '$(nuclear).$(subjob).user.detsim.root'
         additionalArgs: 'gendecay --nuclear $(nuclear) --volume pTarget --material LS'
 
-        ## fullArgs = seed + ... + additionalArgs
+        ## Alternatively, use fullArgs to define all settings above. FullArgs is what is directly served to JUNO scripts as parameters,
         #fullArgs: '--evtmax 5000 --seed $(seed) --output $(nuclear).$(subjob).detsim.root --user-output $(nuclear).$(subjob).user.detsim.root gendecay --nuclear $(nuclear) --volume pTarget --material LS'
 
-            
+
+        ## By default, any output files matching the wildcard *STEP_NAME* will be uploaded to DFC. You may also tag additional files for uploads here.
+        #outputUpload: '*detsim*, *detsim_user*'    
     
     
         

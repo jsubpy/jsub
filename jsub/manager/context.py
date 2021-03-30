@@ -53,6 +53,7 @@ class ContextManager(object):
         context['general']['scenario']       = task_data['scenario']['type']
         context['general']['task_name'] = task_data['name']
         context['general']['backend']   = task_data['backend']['type']
+        context['general']['stop_after_unit_fail']   = True
 
         context['event'] = task_data['event']
 
