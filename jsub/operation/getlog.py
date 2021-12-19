@@ -53,6 +53,6 @@ class Getlog(object):
 			else:
 				ngood+=1
 			
-		self.__logger.info('Successfully retrieved log file of %s subjobs'%ngood)
+		self.__logger.info('Retrieved log files of %s subjobs'%ngood)
 
 

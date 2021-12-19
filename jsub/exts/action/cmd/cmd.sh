@@ -12,6 +12,8 @@ err="$logdir/cmd.err"
 # execution of command
 cmd="$JSUB_cmd"
 (time eval $cmd) 1>"$out" 2>"$err"
+cat $out >&1
+cat $err >&2
 
 # save the exit code
 result=$?

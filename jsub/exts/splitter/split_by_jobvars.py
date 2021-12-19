@@ -158,15 +158,18 @@ class SplitByJobvars(object):
 		
 			overall_jobvar_list=tmp_list
 
-
 		# Resolving the values of composite_string and eval, from priority 10->0
 		# replace $(var_name)/${var_name} with actual values in the subjob
 		for i_subjob in range(len(overall_jobvar_list)):
 			jobvars = copy.deepcopy(overall_jobvar_list[i_subjob])
 			for jobvar in jobvars: #jobvar -> pythonic vars; (to do: avoiding conflict)
-				code_str=str(jobvar)+"='"+str(jobvars[jobvar])+"'"
-				exec(str(jobvar)+"='"+str(jobvars[jobvar])+"'") 			
-			for p_now in range(0,10)[::-1]:
+				code_str=str(jobvar)+"="+str(jobvars[jobvar])+""	#eval the python_var as a int
+				code_str2=str(jobvar)+"='"+str(jobvars[jobvar])+"'"	#eval the python_var as a string
+				try:
+					exec(code_str)
+				except:
+					exec(code_str2)
+			for p_now in range(0,11)[::-1]: 
 				for jobvar0 in jobvars:
 					if priority[jobvar0]==p_now:
 						# try resolving composite string
@@ -186,12 +189,12 @@ class SplitByJobvars(object):
 							
 						# try resolving eval
 						if jobvar0 in eval_list:
+							# bug: pythonic_jobvars in eval are treated as strings when they should be integers. how to fix?
 							eval_result=eval(jobvars[jobvar0])
 							jobvars[jobvar0]=eval_result
-	
+
 						# update pythonic var
 						exec(str(jobvar0)+"='"+str(jobvars[jobvar0])+"'") 			
-
 			overall_jobvar_list[i_subjob]=copy.deepcopy(jobvars)
 
 		return overall_jobvar_list

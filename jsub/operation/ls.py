@@ -47,7 +47,7 @@ class Ls(object):
 		statuses=task.data['status'].split('|')
 		if task.data['backend'].get('type') in ['local']: #skip checking jobs with local backend
 			return False
-		if len(statuses)<5:	# New/Submitted/Unknown
+		if len(statuses)<5:	# New/Submitted/Rescheduled/Unknown
 			if statuses[0] in ['New','Unknown']:
 				return False
 			else:

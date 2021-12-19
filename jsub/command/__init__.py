@@ -154,35 +154,39 @@ def getlog(ctx, task_id,  sub_id ,path, status, njobs):
 @click.option('--failed' ,'-f' , is_flag=True, default = False, help='reschedule jobs with Failed status')
 @click.option('--running' ,'-r' , is_flag=True, default = False, help='reschedule jobs with Running status')
 @click.option('--waiting' ,'-w' , is_flag=True, default = False, help='reschedule jobs with Waiting status')
+@click.option('--status' ,'-s' , type=str, default = '', help='reschedule jobs with given status (Done/Failed/Running/Waiting)')
 @click.option('--sub_id', '-i', type=str, default='', help ='List the subjobs with matched sub IDs, separate numbers with comma.')
 @click.option('--backend_id', '-b', type=str, default='', help ='List the subjobs with matched backend job IDs, separate numbers with comma.')
 @click.pass_context
 
-def reschedule(ctx, task_id, done, failed, running, waiting, sub_id, backend_id):
+def reschedule(ctx, task_id, done, failed, running, waiting, sub_id, backend_id,status):
 	"""Reschedule selected subjobs."""
 	from jsub.command.reschedule import Reschedule
-	status=''
+	status_out=''
+	for x in ['done','waiting','running','failed']:
+		if x in status:
+			status_out+=x[0].upper()
 	if failed:
-		status+='F'
+		status_out+='F'
 	if running:
-		status+='R'
+		status_out+='R'
 	if waiting:
-		status+='W'
+		status_out+='W'
 	if done:
-		status+='D'
+		status_out+='D'
 	
-	cmd = Reschedule(jsubrc=ctx.obj['jsubrc'], task_id=task_id, status=status, sub_id=sub_id, backend_id=backend_id)
+	cmd = Reschedule(jsubrc=ctx.obj['jsubrc'], task_id=task_id, status=status_out, sub_id=sub_id, backend_id=backend_id)
 	cmd.execute()
 
-#@cli.command()
-#@click.argument('input_list', type=click.Path(exists=True))
-#@click.pass_context
-#def register(ctx, input_list):
-#	"""Upload files to SE and register them to DFC. INPUT_LIST should be a text file that contains the names of relevant files."""
-#	from jsub.command.register_to_dfc import RegisterToDFC
-#	input_list = click.format_filename(input_list)
-#	cmd = RegisterToDFC(jsubrc=ctx.obj['jsubrc'], input_list=input_list)
-#	cmd.execute()
+@cli.command()
+@click.argument('input_list', type=click.Path(exists=True))
+@click.pass_context
+def register(ctx, input_list):
+	"""Upload files to SE and register them to DFC. INPUT_LIST should be a text file that contains the names of relevant files."""
+	from jsub.command.register_to_dfc import RegisterToDFC
+	input_list = click.format_filename(input_list)
+	cmd = RegisterToDFC(jsubrc=ctx.obj['jsubrc'], input_list=input_list)
+	cmd.execute()
 
 
 

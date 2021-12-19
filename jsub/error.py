@@ -1,13 +1,11 @@
 class JsubError(Exception):
     pass
 
-
 class SplitterError(JsubError):
     pass
 
 class SplitterParamError(SplitterError):
     pass
-
 
 class LauncherError(JsubError):
     pass

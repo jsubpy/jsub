@@ -1,0 +1,82 @@
+##----------------------------------------------------
+## CEPC Sim-Rec example that runs on login node, used for quick tests of settings.
+##----------------------------------------------------
+taskName: cepc_SimRec
+experiment: cepc
+
+## Define CEPC software version
+softVersion: '0.1.1'
+
+
+backend: 
+   type: local
+
+splitter:
+    mode: splitByJobvars
+    maxSubJobs: 10
+    jobvarLists:
+        stdhepFile:
+            type: pfnlist
+            folder: '/cefs/data/stdhep/CEPC360/4fermions/E360.Psw_l.e0.p0.whizard195/'
+            suffix: 'stdhep'
+            group: stdhep
+        ijob:
+            type: range
+            first: 1
+            group: stdhep
+        icount:
+            type: range
+            first: 0
+            length: 2
+            group: same_stdhep
+            priority: 1
+        skip:
+            type: eval
+            value: '1000*int(icount)'  
+            group: same_stdhep     
+            priority: 0
+        seed:
+            type: range
+            first: 10000
+#           group: default
+
+workflow:
+    steps: [cepcSim,cepcRec]
+#    steps: [cepcRec]
+    cepcSim:
+        ## attributes in simu.macro
+        stdhepFile: '$(stdhepFile)'
+        maxEvent: 1
+
+        ## attributes about steering file
+        steerFile: './sim/simu.steer'   # steering file template.
+        startEventNumber: '$(skip)'
+        seed: '$(seed)'
+
+        output: 'E360GeVSimu_$(ijob)_$(icount).sim.slcio'
+        gearOutput: 'GearOutput.xml'
+        ## can use outputLFN instead of output, to put files into complex folder structure.
+#       outputLFN: "cefs/user/.../E360GeVSimu_$(ijob)_$(icount).slcio"
+        
+        ## for additional settings in steering file, can use macros in template and replace them to subjob-varying parameters
+#       textReplace:    
+#           SIMUFILE: 'E360GeVSimu_$(ijob)_$(icount).slcio'
+#           SETTING_NAME: '$(setting_value)'
+
+
+    cepcRec:
+        steerFile: './rec/generalRec.xml'
+
+        ## If cepcSim is in workflow, would use its output as input files; 
+        ## Otherwise give a local path for gear file so that it will be put into input sandbox, and give paths of LFN for LCIO input files. 
+#        gearInput: './rec/gear.xml'
+#        LCIOInput: '$(lcioInput_lfn)'
+
+        LCIOOutput: 'E360GeVSimu_$(ijob)_$(icount).rec.slcio'   # output: 'E360GeVSimu_$(ijob)_$(icount).rec.slcio'
+        ROOTFile: 'E360GeVSimu_$(ijob)_$(icount).root'
+
+        ## for additional settings in steering file, can use macros in templates and replace them to subjob-varying parameters 
+#       textReplace:   
+#           LCIOINPUT: 'E360GeVSimu_$(ijob)_$(icount).sim.slcio'
+#           SETTING_NAME: '$(setting_value)' 
+

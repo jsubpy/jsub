@@ -72,7 +72,8 @@ def add_file_logger(log_root):
 def add_unit_logger(unit):
 	logger = logging.getLogger('JSUB_'+unit)
 
-	log_file = os.path.join(logroot,'unit',unit+'.log')
+	log_file = os.path.join(logroot,'unit',unit,unit+'.log')
+	mkdir_safe(os.path.dirname(log_file))
 
 	fh = logging.FileHandler(log_file)
 	fh.setLevel(logging.DEBUG)
@@ -402,8 +403,8 @@ class UnitRunner:
 		stdin = self.__var_2_stdin(var_pipe)
 
 		# create thread for a unit
-#		mkdir_safe(data['sysvar']['run_dir'])
-#		mkdir_safe(data['sysvar']['log_dir'])
+		mkdir_safe(data['sysvar']['run_dir'])
+		mkdir_safe(data['sysvar']['log_dir'])
 		self.__unit_threads[unit] = UnitThread(self.__queue_unit, unit, args, cwd, env, stdin)
 		self.__unit_threads[unit].start()
 		self.__unit_threads[unit].unit_pid()

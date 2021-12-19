@@ -28,7 +28,6 @@ class Create(object):
 
 		scenario_data = self.__config_mgr.scenario_data(self.__task_profile)
 		scenario_result = self.__scenario_mgr.build(scenario_data, backend_property)
-
 		scenario_input = scenario_result.get('input',	 {})
 		workflow  = scenario_result.get('workflow',  {})
 		prop	  = scenario_result.get('prop',	  {})

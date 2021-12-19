@@ -10,7 +10,7 @@ class Submit(object):
 		self.__task	= self.__manager.load_task(task_id)
 		self.__sub_ids = sub_ids
 		self.__dry_run = dry_run
-		self.__resubmit = resubmit
+		self.__resubmit = resubmit	
 
 		self.__logger = logging.getLogger('JSUB')
 		if self.__sub_ids==None:

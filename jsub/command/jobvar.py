@@ -13,8 +13,8 @@ class Jobvar(object):
 		self.__max_cycle = max_cycle
 
 	def execute(self):
-		click.echo("Showing the information of jobvar lists for task %d"%self.__task_id)
-		click.echo("")
+#		click.echo("Showing the information of jobvar lists for task %d"%self.__task_id)
+#		click.echo("")
 
 		j = Jsub(self.__jsubrc)
 		j.jobvar(self.__task_id, sub_id = self.__sub_id, jobvar = self.__jobvar, max_cycle = self.__max_cycle)

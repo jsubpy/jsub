@@ -1,0 +1,27 @@
+/Mokka/init/BatchMode true
+/Mokka/init/printLevel 2
+/Mokka/init/detectorModel CEPC_v4
+/Mokka/init/EditGeometry/rmSubDetector ftd_cepc_v4
+/Mokka/init/EditGeometry/newSubDetector SiTracker01 1
+
+/Mokka/init/randomSeed 56765
+#/Mokka/init/dbHost 202.122.37.75
+/Mokka/init/dbHost 202.122.33.73
+#/Mokka/init/dbHost 202.114.78.211 
+/Mokka/init/user consult
+/Mokka/init/dbPasswd consult
+
+/Mokka/init/globalModelParameter SiTrackerEndcap FTD_PIXEL,29.5,151.9,220,16;FTD_PIXEL,30.54,151.9,371,16;FTD_STRIP,32.5,299,645,16;FTD_STRIP,34,309,846,16;FTD_STRIP,35.5,309,925,16
+/Mokka/init/globalModelParameter SiTrackerLayerStructure FTD_PIXEL,Si:-0.02,CarbonFiber:1;FTD_STRIP,Si:-0.2,CarbonFiber:2,Si:-0.2
+
+/Mokka/init/lcioFilename output/SIMUFILE
+/Mokka/init/initialMacroFile event_SB1_SB2.macro
+/Mokka/init/startEventNumber Num0
+/Mokka/init/MokkaGearFileName GearOutput.xml
+/Mokka/init/lcioDetailedShowerMode true
+/Mokka/init/userInitBool WriteCompleteHepEvt true
+/Mokka/init/lcioWriteMode WRITE_NEW
+/Mokka/init/lcioStoreCalHitPosition true
+/Mokka/init/lcioDetailedTRKHitMode TPCCollection                                                                                                      
+
+exit 

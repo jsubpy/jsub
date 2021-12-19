@@ -1,0 +1,72 @@
+##----------------------------------------------------
+## CEPCSim, generates 20 jobs for each stdhep file.
+##----------------------------------------------------
+taskName: cepc_Sim
+experiment: cepc
+
+## Define CEPC software version
+softVersion: '0.1.1'
+
+
+backend: 
+   type: dirac
+   jobGroup: jsub_cepc
+   site:
+#       - CLOUD.JINRONE.ru
+       - GRID.IHEP.cn 
+   outputDir: 'BGSimuRec/testSim/'
+   overwrite: true
+
+splitter:
+    mode: splitByJobvars
+    maxSubJobs: 1000        ## the number of subjobs cannot exceed this     
+    jobvarLists:
+        stdhepFile:
+            type: find_lfns         # dirac-dms-find-lfns
+            path: '/cepc/lustre-ro/cefs/data/stdhep/CEPC360/4fermions/E360.Pzz_l.e0.p0.whizard195/'
+            metaspec: '"Size>1000" "CreationDate>2010-01-01"'  
+            group: stdhep
+        channel:           # zz_l04mu
+            type: eval  # pythonic eval
+            value: "stdhepFile.split('/')[-1].split('.')[0]"      
+        ijob:
+            type: eval
+            value: "stdhepFile.split('.')[-2]"
+        icount:
+            type: range
+            first: 0
+            length: 20
+            group: same_stdhep
+            priority: 1     ## from priority 9->0, the values of jobvar lists are resolved in order.
+        skip:
+            type: eval      
+            value: '1000*int(icount)'  
+            group: same_stdhep     
+            priority: 0
+        seed:
+            type: range
+            first: 10000
+
+workflow:
+    steps: [cepcSim]
+    cepcSim:
+        ## attributes in simu.macro
+        stdhepFile: '$(stdhepFile)'
+        maxEvent: 1000
+
+        ## attributes about steering file
+        steerFile: './sim/simu.steer'   # steering file template.
+        startEventNumber: '$(skip)'
+        seed: '$(seed)'
+
+        output: 'E360GeVSimu__$(channel)_$(ijob)_$(icount).sim.slcio'
+        gearOutput: './sim/GearOutput.xml'
+        ## can use outputLFN instead of output, to put files into complex folder structure.
+#        outputLFN: "/cepc/user/y/yyang/cepcSim_example/$(stdhepFile)/E360GeVSimu_$(ijob)_$(icount).slcio"
+        outputUpload:
+            - "*sim.slcio"
+
+        ## for additional settings in steering file, can use macros in template and replace them to subjob-varying parameters
+#       textReplace:    
+#           SIMUFILE: 'E360GeVSimu_$(ijob)_$(icount).slcio'
+#           SETTING_NAME: '$(setting_value)'

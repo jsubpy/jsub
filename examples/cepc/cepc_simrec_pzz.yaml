@@ -1,0 +1,98 @@
+##----------------------------------------------------
+## CEPC Sim-Rec example, which generates 20 jobs for each stdhep file.
+##----------------------------------------------------
+taskName: cepc_SimRec_Pzz_l
+experiment: cepc
+
+## Define CEPC software version
+softVersion: '0.1.1'
+
+
+backend: 
+   type: dirac
+   jobGroup: jsub_cepc
+   site:
+       - GRID.IHEP.cn 
+   outputDir: 'BGSimuRec/Pzz_l'     # files are uploaded to (userHome)/(outputDir)
+   overwrite: true
+
+splitter:
+    mode: splitByJobvars    # combining subjob-variable lists into parameter-set list for each subjob
+    maxSubJobs: 1000  # the number of subjobs cannot exceed this
+    jobvarLists:
+        stdhepFile:
+            type: find_lfns     # dirac-dms-find-lfns
+            path: '/cepc/lustre-ro/cefs/data/stdhep/CEPC360/4fermions/E360.Pzz_l.e0.p0.whizard195/'
+            metaspec: '"Size>1000" "CreationDate>2010-01-01"'  
+            group: stdhep
+        channel:           # zz_l04mu
+            type: eval  # pythonic eval
+            value: "stdhepFile.split('/')[-1].split('.')[0]"      
+        ijob:   # idx of stdhep file
+            type: eval
+            value: "stdhepFile.split('.')[-2]"
+        icount: # idx for subjobs with the same stdhep file
+            type: range
+            first: 0
+            length: 20
+            group: same_stdhep
+            priority: 1     ## from priority 9->0, the values of jobvar lists are resolved in order.
+        skip:
+            type: eval
+            value: '1000*int(icount)'  
+            group: same_stdhep     
+            priority: 0
+        seed:   
+            type: range
+            first: 10000
+
+workflow:
+    steps: [cepcSim,cepcRec]
+    cepcSim:
+        ## attributes in simu.macro
+        stdhepFile: '$(stdhepFile)'     # /generator/generator; would relocate to ./ if on DIRAC backend.
+        maxEvent: 1000
+
+        ## attributes about steering file
+        steerFile: './sim/simu.steer'   # steering file template.
+        startEventNumber: '$(skip)'
+        seed: '$(seed)'
+
+        output: 'E360GeVSimu_$(channel)_$(ijob)_$(icount).sim.slcio'
+        gearOutput: './sim/GearOutput.xml'
+        ## can use outputLFN instead of output, to put files into complex folder structure.
+#       outputLFN: "/cefs/user/.../E360GeVSimu_$(ijob)_$(icount).slcio"
+        
+        ## for additional settings in steering file, can use macros in template and replace them to subjob-varying parameters
+#       textReplace:    
+#           SIMUFILE: 'E360GeVSimu_$(ijob)_$(icount).slcio'
+#           SETTING_NAME: '$(setting_value)'
+
+        ## For DIRAC backend, list of files to upload from worknode to SE. Wildcards are accepted.
+        outputUpload:
+            - '*sim.slcio'
+
+
+    cepcRec:
+        steerFile: './rec/generalRec.xml'
+
+        ## If cepcSim is in workflow, would use its output as input files; 
+        ## Otherwise give a local path for gear file so that it will be put into input sandbox, and give LFN paths for LCIO input files on Dirac File Catalog. 
+#        gearInput: './rec/gear.xml'
+#        LCIOInput: '$(lcioInput_lfn)'
+
+        ## output files can be defined with attribute here, or by replacing keyword in reco.xml template
+        LCIOOutput: 'E360GeVSimu_$(channel)_$(ijob)_$(icount).rec.slcio'   ## output: 'E360GeVSimu_$(ijob)_$(icount).rec.slcio'
+        ROOTFile: 'E360GeVSimu_$(channel)_$(ijob)_$(icount).rec.root'        ## replace value of rootFileName parameter
+        
+        ## For DIRAC backend, list of files to upload from worknode to SE. Wildcards are accepted.
+        outputUpload: 
+            - '*rec.root'
+            - '*rec.slcio'    
+            - '*xml'
+        ## for additional settings in steering file, can use macros in templates and replace them to subjob-varying parameters 
+
+#        textReplace:   
+#            LCIOINPUT: 'E360GeVSimu_$(channel)_$(ijob)_$(icount).sim.slcio'
+#            LCIOOUTPUT: 'E360GeVSimu_$(channel)_$(ijob)_$(icount).rec.slcio'
+

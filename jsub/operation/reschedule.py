@@ -42,6 +42,9 @@ class Reschedule(object):
 			self.__logger.info('Resubmitting jobs with selected backend-ids in Task %d.'%self.__task_id)
 			result = self.__backend_mgr.reschedule(self.__task.data['backend'], backend_task_id, backend_ids = self.__backend_ids)
 
+		else:
+			self.__logger.info('No valid status from Done/Failed/Running/Waiting is selected for reschedule command.')
+
 		if result.get('OK'):
 			if isinstance(result['Value'], dict):
 				length=len(result['Value'].get('JobID',[]))
@@ -51,5 +54,8 @@ class Reschedule(object):
 				length=0
 			self.__logger.info('Successfully rescheduled %d jobs.'%length)
 
+			self.__task.data['status']='Rescheduled'
+			task_pool = self.__manager.load_task_pool()
+			task_pool.save(self.__task)
 		
 	

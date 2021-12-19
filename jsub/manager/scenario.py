@@ -34,4 +34,4 @@ class ScenarioManager(object):
 				result['workflow'][unit].update({'actvar':actvar})	
 
 
-		return scenario.build(backend_property)
+		return result

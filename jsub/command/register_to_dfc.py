@@ -7,6 +7,7 @@ from jsub import Jsub
 from jsub.config  import load_config_file
 
 JSUB_COMMAND_DIR = os.path.dirname(os.path.realpath(__file__))
+JSUB_ROOT_DIR = os.path.dirname(JSUB_COMMAND_DIR)
 
 #usage: jsub register <filelist>/<folder_name>
 #	the command would run the dirac-register.sh script, which register the files to DFC; 
@@ -26,12 +27,18 @@ class RegisterToDFC(object):
 				files = [x for x in f.read().splitlines() if os.path.isfile(x)]
 		if os.path.isdir(self.__input_list):	#all files in folder
 			files = [os.path.join(os.path.realpath(self.__input_list),f) for f in os.listdir(self.__input_list) if os.path.isfile(os.path.join(os.path.realpath(self.__input_list),f))]
-
+		
+		cmd_reg = [os.path.join(JSUB_ROOT_DIR, 'scripts', 'dirac-register.sh')]
+		counter=0
 		for input_file in files:
-			cmd_reg = [os.path.join(JSUB_ROOT_DIR, 'scripts', 'dirac-register.sh')]
+			counter+=1
 			cmd_reg.insert(999,input_file)
-			reg_status=subprocess.call(cmd_reg)
-	
-			if reg_status!=0:
-				click.echo("Error when registering file to DFC. (%s)" % input_file)
+
+			if counter%20==0 or counter==len(files):
+				print('registering files: %s/%s'%(counter,len(files)))
+				reg_status=subprocess.call(cmd_reg)
+				cmd_reg = [os.path.join(JSUB_ROOT_DIR, 'scripts', 'dirac-register.sh')]
+
+				if reg_status!=0:
+					click.echo("Error when registering file to DFC. (%s)" % input_file)
 
